@@ -80,4 +80,4 @@ Todos los derechos reservados.
 
 ---
 
-\_Desarrollado por Ikas73
+_Desarrollado por [Tu Nombre o Usuario]_
