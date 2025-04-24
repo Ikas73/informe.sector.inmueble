@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 25px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .section-title {
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 15px;
+      }
+      .section-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background-color: #4ecdc4;
+        border-radius: 2px;
+      }
+      .conclusion-card {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+        transition: all 0.3s ease;
+        border-left: 4px solid #4ecdc4;
+      }
+      .conclusion-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .recommendation-box {
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+      }
+      .recommendation-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+      .recommendation-header {
+        padding: 12px 16px;
+        font-weight: 600;
+      }
+      .short-term .recommendation-header {
+        background: rgba(78, 205, 196, 0.2);
+        border-bottom: 1px solid rgba(78, 205, 196, 0.3);
+      }
+      .mid-term .recommendation-header {
+        background: rgba(255, 209, 102, 0.2);
+        border-bottom: 1px solid rgba(255, 209, 102, 0.3);
+      }
+      .long-term .recommendation-header {
+        background: rgba(6, 214, 160, 0.2);
+        border-bottom: 1px solid rgba(6, 214, 160, 0.3);
+      }
+      .recommendation-content {
+        padding: 12px 16px;
+      }
+      .recommendation-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+      .recommendation-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .recommendation-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+      .short-term .recommendation-icon {
+        background: rgba(78, 205, 196, 0.2);
+        color: #4ecdc4;
+      }
+      .mid-term .recommendation-icon {
+        background: rgba(255, 209, 102, 0.2);
+        color: #ffd166;
+      }
+      .long-term .recommendation-icon {
+        background: rgba(6, 214, 160, 0.2);
+        color: #06d6a0;
+      }
+      .icon-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .icon-circle.conclusion {
+        background: rgba(78, 205, 196, 0.2);
+        color: #4ecdc4;
+      }
+      .icon-circle.recommendation {
+        background: rgba(255, 209, 102, 0.2);
+        color: #ffd166;
+      }
+      .icon-circle:hover {
+        transform: scale(1.1);
+      }
+      .future-factor {
+        background: rgba(10, 35, 66, 0.5);
+        border-radius: 8px;
+        padding: 10px;
+        transition: all 0.3s ease;
+        height: 100%;
+        border-bottom: 3px solid #4ecdc4;
+      }
+      .future-factor:hover {
+        transform: translateY(-3px);
+        background: rgba(10, 35, 66, 0.7);
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      .oculto {
+        display: none;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+        }
+      }
+      .circle-decoration {
+        position: absolute;
+        bottom: -80px;
+        right: -80px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.1) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .circle-decoration-2 {
+        position: absolute;
+        top: -100px;
+        left: -100px;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.08) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .highlight-text {
+        font-weight: 600;
+        font-size: 1.05em;
+      }
+      .highlight-teal {
+        color: #4ecdc4;
+      }
+      .highlight-yellow {
+        color: #ffd166;
+      }
+      .highlight-green {
+        color: #06d6a0;
+      }
+      .highlight-red {
+        color: #ff6b6b;
+      }
+      .key-message {
+        background: linear-gradient(
+          135deg,
+          rgba(78, 205, 196, 0.15),
+          rgba(10, 35, 66, 0.25)
+        );
+        border-radius: 12px;
+        border-left: 4px solid #4ecdc4;
+        padding: 16px;
+        margin-top: 24px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+      .progress-bar {
+        height: 4px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        position: relative;
+        margin-top: 6px;
+        border-radius: 2px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 2px;
+        background: #4ecdc4;
+      }
+      .indicator-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="circle-decoration"></div>
+      <div class="circle-decoration-2"></div>
+      <div class="content">
+        <h1 class="title">Conclusiones y Recomendaciones</h1>
+
+        <div class="grid grid-cols-12 gap-6 mt-5 z-10">
+          <!-- Left column: Key conclusions -->
+          <div class="col-span-5">
+            <div class="flex items-center section-title">
+              <div class="icon-circle conclusion pulse">
+                <i class="fas fa-chart-pie text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">
+                Conclusiones Clave
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="conclusion-card">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-chart-line text-teal-400"></i>
+                  </div>
+                  <h3 class="font-semibold">Crecimiento Sólido</h3>
+                </div>
+                <p class="text-gray-300 text-sm">
+                  Incremento del
+                  <span class="highlight-text highlight-teal">12.7%</span> en el
+                  valor del metro cuadrado durante el período 2024-2025.
+                </p>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 75%"></div>
+                </div>
+              </div>
+
+              <div class="conclusion-card">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-globe-europe text-teal-400"></i>
+                  </div>
+                  <h3 class="font-semibold">Demanda Internacional</h3>
+                </div>
+                <p class="text-gray-300 text-sm">
+                  Los compradores extranjeros representan el
+                  <span class="highlight-text highlight-teal">25.1%</span> del
+                  total de transacciones
+                  <span class="text-xs">(+3.2% vs 2023)</span>.
+                </p>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 25.1%"></div>
+                </div>
+              </div>
+
+              <div class="conclusion-card">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-map-marked-alt text-teal-400"></i>
+                  </div>
+                  <h3 class="font-semibold">Zonas más Demandadas</h3>
+                </div>
+                <div class="grid grid-cols-3 gap-1 mb-2">
+                  <div class="text-center bg-white bg-opacity-5 p-2 rounded">
+                    <div class="text-sm font-semibold text-teal-400">
+                      Centro
+                    </div>
+                    <div class="text-xs text-gray-400">+16.7%</div>
+                  </div>
+                  <div class="text-center bg-white bg-opacity-5 p-2 rounded">
+                    <div class="text-sm font-semibold text-teal-400">
+                      Puerto-Canteras
+                    </div>
+                    <div class="text-xs text-gray-400">+15.2%</div>
+                  </div>
+                  <div class="text-center bg-white bg-opacity-5 p-2 rounded">
+                    <div class="text-sm font-semibold text-teal-400">
+                      Vegueta
+                    </div>
+                    <div class="text-xs text-gray-400">+14.8%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conclusion-card">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-8 h-8 rounded-full bg-red-400 bg-opacity-20 flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                  </div>
+                  <h3 class="font-semibold">Disparidad Social</h3>
+                </div>
+                <div
+                  class="flex items-center justify-between text-sm space-x-2"
+                >
+                  <div class="text-gray-300">Aumento de precios:</div>
+                  <div class="highlight-text highlight-teal">+12.7%</div>
+                </div>
+                <div
+                  class="flex items-center justify-between text-sm space-x-2"
+                >
+                  <div class="text-gray-300">Crecimiento de salarios:</div>
+                  <div class="highlight-text highlight-red">+3.2%</div>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">
+                  Generando problemas de accesibilidad para residentes locales.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: Strategic recommendations -->
+          <div class="col-span-7">
+            <div class="flex items-center section-title">
+              <div class="icon-circle recommendation">
+                <i class="fas fa-lightbulb text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">
+                Recomendaciones Estratégicas
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <!-- Short term -->
+              <div class="recommendation-box short-term">
+                <div class="recommendation-header">
+                  <div class="flex items-center">
+                    <div class="indicator-dot bg-teal-400"></div>
+                    <span class="text-teal-400">Corto Plazo</span>
+                    <span class="text-xs text-gray-300 ml-auto"
+                      >6-12 meses</span
+                    >
+                  </div>
+                </div>
+                <div class="recommendation-content">
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Zonas Turísticas
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Invertir en Puerto-Canteras para alquiler vacacional
+                        (ROI: 7.5% anual)
+                      </p>
+                    </div>
+                  </div>
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-hammer"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Reforma de Propiedades
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Adquirir inmuebles antiguos en Centro y Vegueta para
+                        reformar (margen: 15%)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Medium term -->
+              <div class="recommendation-box mid-term">
+                <div class="recommendation-header">
+                  <div class="flex items-center">
+                    <div class="indicator-dot bg-yellow-400"></div>
+                    <span class="text-yellow-400">Medio Plazo</span>
+                    <span class="text-xs text-gray-300 ml-auto">1-3 años</span>
+                  </div>
+                </div>
+                <div class="recommendation-content">
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-map-marked"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Diversificación
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Invertir en Tamaraceite aprovechando nuevos desarrollos
+                        y precios competitivos
+                      </p>
+                    </div>
+                  </div>
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-laptop-house"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Nómadas Digitales
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Adaptar inmuebles para teletrabajadores con espacios de
+                        trabajo y conexión de alta velocidad
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Long term -->
+              <div class="recommendation-box long-term">
+                <div class="recommendation-header">
+                  <div class="flex items-center">
+                    <div class="indicator-dot bg-green-400"></div>
+                    <span class="text-green-400">Largo Plazo</span>
+                    <span class="text-xs text-gray-300 ml-auto">3-5 años</span>
+                  </div>
+                </div>
+                <div class="recommendation-content">
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-leaf"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Desarrollo Sostenible
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Invertir en proyectos con certificación energética A o B
+                        (+20-25% valor)
+                      </p>
+                    </div>
+                  </div>
+                  <div class="recommendation-item">
+                    <div class="recommendation-icon">
+                      <i class="fas fa-road"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-white">
+                        Infraestructuras
+                      </h4>
+                      <p class="text-xs text-gray-300">
+                        Monitorizar futuros desarrollos de transporte público y
+                        adquirir inmuebles en zonas de influencia
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <h3 class="text-lg font-semibold mb-3 flex items-center">
+                <i class="fas fa-binoculars text-teal-400 mr-2"></i>
+                Factores a Vigilar en 2026
+              </h3>
+
+              <div class="grid grid-cols-4 gap-4">
+                <div class="future-factor">
+                  <div
+                    class="w-10 h-10 mb-2 mx-auto rounded-full bg-white bg-opacity-10 flex items-center justify-center"
+                  >
+                    <i class="fas fa-landmark text-yellow-400 text-lg"></i>
+                  </div>
+                  <h4
+                    class="text-center text-sm font-medium text-teal-400 mb-1"
+                  >
+                    Política de Vivienda
+                  </h4>
+                  <p class="text-xs text-center text-gray-300">
+                    Nuevas regulaciones del Gobierno de Canarias sobre viviendas
+                    vacacionales
+                  </p>
+                </div>
+                <div class="future-factor">
+                  <div
+                    class="w-10 h-10 mb-2 mx-auto rounded-full bg-white bg-opacity-10 flex items-center justify-center"
+                  >
+                    <i class="fas fa-plane-arrival text-yellow-400 text-lg"></i>
+                  </div>
+                  <h4
+                    class="text-center text-sm font-medium text-teal-400 mb-1"
+                  >
+                    Turismo
+                  </h4>
+                  <p class="text-xs text-center text-gray-300">
+                    Evolución de la llegada de visitantes y diversificación de
+                    mercados
+                  </p>
+                </div>
+                <div class="future-factor">
+                  <div
+                    class="w-10 h-10 mb-2 mx-auto rounded-full bg-white bg-opacity-10 flex items-center justify-center"
+                  >
+                    <i class="fas fa-euro-sign text-yellow-400 text-lg"></i>
+                  </div>
+                  <h4
+                    class="text-center text-sm font-medium text-teal-400 mb-1"
+                  >
+                    Tipos de Interés
+                  </h4>
+                  <p class="text-xs text-center text-gray-300">
+                    Cambios en política monetaria y acceso a financiación
+                    hipotecaria
+                  </p>
+                </div>
+                <div class="future-factor">
+                  <div
+                    class="w-10 h-10 mb-2 mx-auto rounded-full bg-white bg-opacity-10 flex items-center justify-center"
+                  >
+                    <i class="fas fa-laptop-house text-yellow-400 text-lg"></i>
+                  </div>
+                  <h4
+                    class="text-center text-sm font-medium text-teal-400 mb-1"
+                  >
+                    Teletrabajo
+                  </h4>
+                  <p class="text-xs text-center text-gray-300">
+                    Impacto continuado de nómadas digitales en demanda
+                    residencial
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key message box -->
+        <div class="key-message mt-4">
+          <h3 class="text-lg font-semibold mb-1 text-center text-teal-400">
+            Mensaje Final
+          </h3>
+          <p class="text-center text-gray-200">
+            El mercado inmobiliario en Las Palmas de Gran Canaria seguirá siendo
+            atractivo para inversiones a medio y largo plazo, con especial
+            atención a la zonificación estratégica y la adaptación a las nuevas
+            tendencias de habitabilidad.
+          </p>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-4 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Recomendaciones basadas en
+            el análisis de datos de abril 2024 - abril 2025
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 9
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="page_8.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 9 de 9</span>
+
+          <!-- Botón Siguiente (Deshabilitado en la última página) -->
+          <span
+            class="px-4 py-2 rounded bg-gray-700 text-gray-500 cursor-not-allowed opacity-60 oculto"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </span>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Animate progress bars
+        setTimeout(() => {
+          const bars = document.querySelectorAll(".progress-fill");
+          bars.forEach((bar) => {
+            const width = bar.style.width;
+            bar.style.width = "0%";
+            setTimeout(() => {
+              bar.style.transition = "width 1s ease-out";
+              bar.style.width = width;
+            }, 200);
+          });
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .stat-card {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 16px;
+        height: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(to right, #4ecdc4, #56e8e0);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+      }
+      .stat-card:hover::after {
+        transform: scaleX(1);
+      }
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #4ecdc4;
+      }
+      .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        height: 280px;
+        transition: all 0.3s ease;
+      }
+      .chart-container:hover {
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+      .circle-decoration {
+        position: absolute;
+        top: -100px;
+        left: -100px;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.1) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .highlight-box {
+        background: rgba(78, 205, 196, 0.15);
+        border-radius: 6px;
+        padding: 8px;
+        transition: all 0.3s ease;
+      }
+      .highlight-box:hover {
+        background: rgba(78, 205, 196, 0.25);
+        transform: scale(1.02);
+      }
+      .factor-card {
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .factor-card:hover {
+        transform: translateY(-3px);
+      }
+      .factor-icon {
+        transition: all 0.3s ease;
+      }
+      .factor-card:hover .factor-icon {
+        transform: scale(1.1);
+      }
+      .pulse {
+        box-shadow: 0 0 0 rgba(78, 205, 196, 0.4);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="circle-decoration"></div>
+      <div class="content">
+        <h1 class="title">Evolución del Mercado (Abril 2024-Abril 2025)</h1>
+
+        <!-- Main content grid -->
+        <div class="grid grid-cols-12 gap-6 mt-6 z-10">
+          <!-- Left column: Price evolution chart -->
+          <div class="col-span-7">
+            <h3 class="text-lg font-semibold mb-2 flex items-center">
+              <i class="fas fa-chart-line text-teal-400 mr-2"></i>
+              Evolución de Precios por m² (€)
+            </h3>
+            <div class="chart-container">
+              <canvas id="priceChart"></canvas>
+            </div>
+
+            <div class="mt-4">
+              <div class="grid grid-cols-3 gap-3">
+                <div class="highlight-box text-center">
+                  <div class="text-sm text-gray-300">Incremento Venta</div>
+                  <div class="text-xl font-bold text-teal-400">+19.1%</div>
+                  <div class="text-xs text-gray-400">2167€ → 2580€</div>
+                </div>
+                <div class="highlight-box text-center">
+                  <div class="text-sm text-gray-300">Incremento Alquiler</div>
+                  <div class="text-xl font-bold text-red-400">+18.3%</div>
+                  <div class="text-xs text-gray-400">12.1€ → 14.2€</div>
+                </div>
+                <div class="highlight-box text-center pulse">
+                  <div class="text-sm text-gray-300">Tiempo Medio Venta</div>
+                  <div class="text-xl font-bold text-yellow-400">48 días</div>
+                  <div class="text-xs text-gray-400">-15 días vs 2023</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: Stats and transaction volumes -->
+          <div class="col-span-5">
+            <h3 class="text-lg font-semibold mb-2 flex items-center">
+              <i class="fas fa-exchange-alt text-teal-400 mr-2"></i>
+              Volumen de Transacciones
+            </h3>
+            <div class="chart-container">
+              <canvas id="transactionsChart"></canvas>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <div class="stat-card">
+                <div class="text-sm text-gray-300 mb-1">
+                  Total transacciones
+                </div>
+                <div class="stat-value">5,340</div>
+                <div class="text-sm text-teal-400 mt-1">+8.2% vs 2023</div>
+              </div>
+              <div class="stat-card">
+                <div class="text-sm text-gray-300 mb-1">
+                  Compras extranjeros
+                </div>
+                <div class="stat-value">25.1%</div>
+                <div class="text-sm text-teal-400 mt-1">+3.2% vs 2023</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Construction & Factors section -->
+        <div class="mt-4 grid grid-cols-12 gap-6">
+          <!-- New Construction -->
+          <div class="col-span-5">
+            <h3 class="text-lg font-semibold mb-2 flex items-center">
+              <i class="fas fa-building text-teal-400 mr-2"></i>
+              Nuevas Construcciones
+            </h3>
+            <div class="bg-white bg-opacity-5 p-4 rounded-lg h-full">
+              <div class="flex items-center justify-center gap-3 mb-3">
+                <div
+                  class="text-center px-3 py-2 bg-teal-400 bg-opacity-20 rounded-lg"
+                >
+                  <div class="text-3xl font-bold text-teal-400">336</div>
+                  <div class="text-xs text-gray-300">
+                    Viviendas públicas en construcción
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div
+                  class="text-center px-3 py-2 bg-white bg-opacity-5 rounded-lg"
+                >
+                  <div class="text-2xl font-bold text-teal-400">148</div>
+                  <div class="text-xs text-gray-300">
+                    Unidades en Las Rehoyas
+                  </div>
+                </div>
+                <div
+                  class="text-center px-3 py-2 bg-white bg-opacity-5 rounded-lg"
+                >
+                  <div class="text-2xl font-bold text-teal-400">76</div>
+                  <div class="text-xs text-gray-300">
+                    Viviendas ARRU Tamaraceite
+                  </div>
+                </div>
+                <div
+                  class="text-center px-3 py-2 bg-white bg-opacity-5 rounded-lg"
+                >
+                  <div class="text-2xl font-bold text-teal-400">68</div>
+                  <div class="text-xs text-gray-300">
+                    Nuevas en Tamaraceite Sur
+                  </div>
+                </div>
+                <div
+                  class="text-center px-3 py-2 bg-white bg-opacity-5 rounded-lg"
+                >
+                  <div class="text-2xl font-bold text-teal-400">44</div>
+                  <div class="text-xs text-gray-300">Otras promociones</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factors section -->
+          <div class="col-span-7">
+            <h3 class="text-lg font-semibold mb-2 flex items-center">
+              <i class="fas fa-cogs text-teal-400 mr-2"></i>
+              Factores que han influido en el mercado
+            </h3>
+            <div class="grid grid-cols-3 gap-3 h-full">
+              <div class="factor-card">
+                <div
+                  class="flex-1 flex items-start p-3 bg-white bg-opacity-5 rounded-lg h-full"
+                >
+                  <div
+                    class="rounded-full bg-teal-400 bg-opacity-20 p-2 mr-2 factor-icon"
+                  >
+                    <i class="fas fa-globe text-teal-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-white">Inversión extranjera</h4>
+                    <div class="text-sm font-semibold text-teal-400 mt-1">
+                      25.1%
+                    </div>
+                    <p class="text-xs text-gray-300 mt-1">
+                      Compradores europeos atraídos por clima y ventajas
+                      fiscales
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="factor-card">
+                <div
+                  class="flex-1 flex items-start p-3 bg-white bg-opacity-5 rounded-lg h-full"
+                >
+                  <div
+                    class="rounded-full bg-teal-400 bg-opacity-20 p-2 mr-2 factor-icon"
+                  >
+                    <i class="fas fa-home text-teal-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-white">Escasez de oferta</h4>
+                    <div class="text-sm font-semibold text-yellow-400 mt-1">
+                      0.7%
+                    </div>
+                    <p class="text-xs text-gray-300 mt-1">
+                      Tasa disponibilidad para alquiler residencial
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="factor-card">
+                <div
+                  class="flex-1 flex items-start p-3 bg-white bg-opacity-5 rounded-lg h-full"
+                >
+                  <div
+                    class="rounded-full bg-teal-400 bg-opacity-20 p-2 mr-2 factor-icon"
+                  >
+                    <i class="fas fa-laptop-house text-teal-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-white">Nómadas digitales</h4>
+                    <div class="text-sm font-semibold text-teal-400 mt-1">
+                      +45%
+                    </div>
+                    <p class="text-xs text-gray-300 mt-1">
+                      Incremento en teletrabajadores eligiendo Las Palmas
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-3 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Fuentes: Idealista, ISTAC,
+            Consejo General del Notariado, Ayuntamiento de Las Palmas de GC
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 4
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="page_3.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 4 de 9</span>
+
+          <!-- Botón Siguiente -->
+          <a
+            href="page_5.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </a>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Price evolution chart
+        const priceCtx = document.getElementById("priceChart").getContext("2d");
+
+        // Create gradient for sale prices
+        const saleGradient = priceCtx.createLinearGradient(0, 0, 0, 400);
+        saleGradient.addColorStop(0, "rgba(78, 205, 196, 0.4)");
+        saleGradient.addColorStop(1, "rgba(78, 205, 196, 0.0)");
+
+        // Create gradient for rent prices
+        const rentGradient = priceCtx.createLinearGradient(0, 0, 0, 400);
+        rentGradient.addColorStop(0, "rgba(255, 107, 107, 0.4)");
+        rentGradient.addColorStop(1, "rgba(255, 107, 107, 0.0)");
+
+        const priceChart = new Chart(priceCtx, {
+          type: "line",
+          data: {
+            labels: [
+              "Abr 24",
+              "May 24",
+              "Jun 24",
+              "Jul 24",
+              "Ago 24",
+              "Sep 24",
+              "Oct 24",
+              "Nov 24",
+              "Dic 24",
+              "Ene 25",
+              "Feb 25",
+              "Mar 25",
+              "Abr 25",
+            ],
+            datasets: [
+              {
+                label: "Venta (€/m²)",
+                data: [
+                  2167, 2205, 2240, 2290, 2340, 2372, 2405, 2430, 2482, 2510,
+                  2530, 2565, 2580,
+                ],
+                borderColor: "#4ECDC4",
+                backgroundColor: saleGradient,
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointBackgroundColor: "#4ECDC4",
+                pointHoverBackgroundColor: "white",
+                pointBorderColor: "rgba(255, 255, 255, 0.8)",
+                pointBorderWidth: 2,
+                yAxisID: "y",
+              },
+              {
+                label: "Alquiler (€/m²/mes)",
+                data: [
+                  12.1, 12.3, 12.6, 12.8, 13.0, 13.2, 13.5, 13.7, 13.9, 14.0,
+                  14.1, 14.2, 14.2,
+                ],
+                borderColor: "#FF6B6B",
+                backgroundColor: rentGradient,
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointBackgroundColor: "#FF6B6B",
+                pointHoverBackgroundColor: "white",
+                pointBorderColor: "rgba(255, 255, 255, 0.8)",
+                pointBorderWidth: 2,
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: "index",
+              intersect: false,
+            },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  padding: 15,
+                  color: "#ffffff",
+                  font: {
+                    family: "Montserrat",
+                    size: 11,
+                  },
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(10, 35, 66, 0.8)",
+                titleFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                bodyFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: true,
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.dataset.yAxisID === "y") {
+                      label += context.parsed.y + " €/m²";
+                    } else {
+                      label += context.parsed.y + " €/m²/mes";
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                beginAtZero: false,
+                min: 2000,
+                max: 2700,
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  callback: function (value) {
+                    return value + " €";
+                  },
+                  font: {
+                    size: 10,
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Precio Venta (€/m²)",
+                  color: "#4ECDC4",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                beginAtZero: false,
+                min: 10,
+                max: 16,
+                grid: {
+                  drawOnChartArea: false,
+                },
+                ticks: {
+                  color: "#FF6B6B",
+                  callback: function (value) {
+                    return value + " €";
+                  },
+                  font: {
+                    size: 10,
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Precio Alquiler (€/m²/mes)",
+                  color: "#FF6B6B",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              x: {
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                  maxRotation: 45,
+                  minRotation: 45,
+                },
+              },
+            },
+            animations: {
+              tension: {
+                duration: 1000,
+                easing: "linear",
+              },
+            },
+          },
+        });
+
+        // Transactions chart
+        const transactionsCtx = document
+          .getElementById("transactionsChart")
+          .getContext("2d");
+
+        // Create gradient for transactions
+        const transactionsGradient = transactionsCtx.createLinearGradient(
+          0,
+          0,
+          0,
+          300
+        );
+        transactionsGradient.addColorStop(0, "rgba(78, 205, 196, 1)");
+        transactionsGradient.addColorStop(1, "rgba(78, 205, 196, 0.3)");
+
+        const transactionsChart = new Chart(transactionsCtx, {
+          type: "bar",
+          data: {
+            labels: ["Q2 2024", "Q3 2024", "Q4 2024", "Q1 2025"],
+            datasets: [
+              {
+                label: "Volumen de transacciones",
+                data: [1250, 1380, 1420, 1290],
+                backgroundColor: transactionsGradient,
+                borderColor: "rgba(78, 205, 196, 1)",
+                borderWidth: 2,
+                borderRadius: 6,
+                barThickness: 40,
+                hoverBackgroundColor: "rgba(78, 205, 196, 1)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(10, 35, 66, 0.8)",
+                titleFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                bodyFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                padding: 10,
+                cornerRadius: 6,
+                callbacks: {
+                  label: function (context) {
+                    return "Transacciones: " + context.parsed.y;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+            },
+            animations: {
+              y: {
+                duration: 2000,
+                delay: 500,
+              },
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

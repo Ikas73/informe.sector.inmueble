@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .methodology-box {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 20px;
+        height: 280px;
+      }
+      .icon-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background-color: rgba(78, 205, 196, 0.2);
+        border-radius: 50%;
+        margin-right: 15px;
+      }
+      .circle-decoration {
+        position: absolute;
+        bottom: -100px;
+        right: -100px;
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.1) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .data-source-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #4ecdc4;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      .data-source-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(3px);
+      }
+      .socio-item {
+        transition: all 0.2s ease;
+      }
+      .socio-item:hover {
+        transform: translateX(5px);
+      }
+      .socio-item i {
+        transition: all 0.2s ease;
+      }
+      .socio-item:hover i {
+        transform: scale(1.2);
+      }
+      .highlight-data {
+        color: #4ecdc4;
+        font-weight: 600;
+      }
+      .method-step {
+        transition: all 0.2s ease;
+      }
+      .method-step:hover {
+        transform: translateY(-3px);
+      }
+      .glow {
+        animation: glow 2s infinite alternate;
+      }
+      @keyframes glow {
+        from {
+          box-shadow: 0 0 0px rgba(78, 205, 196, 0);
+        }
+        to {
+          box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="circle-decoration"></div>
+      <div class="content">
+        <h1 class="title">Contexto y Metodología</h1>
+
+        <div class="grid grid-cols-2 gap-6 mt-8 z-10">
+          <!-- Columna izquierda: Entorno socioeconómico -->
+          <div>
+            <div class="flex items-center mb-4">
+              <div class="icon-circle glow">
+                <i class="fas fa-city text-teal-400 text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">
+                Entorno Socioeconómico
+              </h2>
+            </div>
+
+            <div class="p-4 bg-opacity-10 bg-white rounded-lg">
+              <ul class="space-y-3 pl-1">
+                <li class="flex items-start socio-item">
+                  <i class="fas fa-chart-pie text-teal-400 mt-1 mr-3"></i>
+                  <span
+                    >Crecimiento económico de Canarias del
+                    <span class="highlight-data">3.6%</span> en 2024, superior a
+                    la media nacional
+                    <span class="text-xs text-teal-400"
+                      >(+1.2% sobre media)</span
+                    ></span
+                  >
+                </li>
+                <li class="flex items-start socio-item">
+                  <i class="fas fa-users text-teal-400 mt-1 mr-3"></i>
+                  <span
+                    >Aumento poblacional del
+                    <span class="highlight-data">1.8%</span> en Las Palmas de
+                    Gran Canaria, impulsado por la inmigración extranjera y
+                    peninsular</span
+                  >
+                </li>
+                <li class="flex items-start socio-item">
+                  <i class="fas fa-plane-arrival text-teal-400 mt-1 mr-3"></i>
+                  <span
+                    >Récord de turismo con
+                    <span class="highlight-data">9.2 millones</span> de
+                    visitantes en Gran Canaria durante 2024
+                    <span class="text-xs text-teal-400"
+                      >(+8.2% vs 2023)</span
+                    ></span
+                  >
+                </li>
+                <li class="flex items-start socio-item">
+                  <i class="fas fa-euro-sign text-teal-400 mt-1 mr-3"></i>
+                  <span
+                    >Inversión extranjera en el mercado inmobiliario representó
+                    el <span class="highlight-data">25.1%</span> del total de
+                    transacciones</span
+                  >
+                </li>
+                <li class="flex items-start socio-item">
+                  <i class="fas fa-home text-teal-400 mt-1 mr-3"></i>
+                  <span
+                    >Déficit de vivienda asequible con más de
+                    <span class="highlight-data">200.000</span> viviendas vacías
+                    en Canarias</span
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="flex items-center mt-6 mb-3">
+              <div class="icon-circle">
+                <i class="fas fa-database text-teal-400 text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">Fuentes de Datos</h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="data-source-item">
+                <div class="font-medium text-teal-400">
+                  Estadísticas oficiales
+                </div>
+                <div class="text-sm text-gray-300">
+                  INE, ISTAC, Ministerio de Vivienda
+                </div>
+              </div>
+              <div class="data-source-item">
+                <div class="font-medium text-teal-400">
+                  Portales inmobiliarios
+                </div>
+                <div class="text-sm text-gray-300">
+                  Idealista, Fotocasa, Tecnocasa
+                </div>
+              </div>
+              <div class="data-source-item">
+                <div class="font-medium text-teal-400">
+                  Registros notariales
+                </div>
+                <div class="text-sm text-gray-300">
+                  Consejo General del Notariado
+                </div>
+              </div>
+              <div class="data-source-item">
+                <div class="font-medium text-teal-400">
+                  Estudios sectoriales
+                </div>
+                <div class="text-sm text-gray-300">
+                  CBRE, Tinsa, Asociación de Promotores
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna derecha: Metodología -->
+          <div>
+            <div class="flex items-center mb-4">
+              <div class="icon-circle glow">
+                <i class="fas fa-tasks text-teal-400 text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">
+                Metodología Aplicada
+              </h2>
+            </div>
+
+            <div class="methodology-box relative">
+              <canvas
+                id="methodologyChart"
+                style="max-height: 100%; width: 100%"
+              ></canvas>
+            </div>
+
+            <div class="mt-5 p-4 bg-opacity-10 bg-white rounded-lg">
+              <p class="text-gray-300 text-sm mb-3">
+                La metodología combina análisis cuantitativo y cualitativo,
+                integrando datos de múltiples fuentes para proporcionar una
+                visión completa del mercado inmobiliario en Las Palmas de Gran
+                Canaria.
+              </p>
+
+              <div class="grid grid-cols-2 gap-4 mt-3">
+                <div class="flex items-start method-step">
+                  <div
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-900 mr-2"
+                  >
+                    <span class="font-semibold text-white">1</span>
+                  </div>
+                  <div>
+                    <p class="font-medium text-white">Análisis estadístico</p>
+                    <p class="text-xs text-gray-300">
+                      Evolución de precios, volumen de transacciones y tipos de
+                      propiedades
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start method-step">
+                  <div
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-900 mr-2"
+                  >
+                    <span class="font-semibold text-white">2</span>
+                  </div>
+                  <div>
+                    <p class="font-medium text-white">Estudio sectorial</p>
+                    <p class="text-xs text-gray-300">
+                      Evaluación de oferta y demanda por zonas y segmentos
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start method-step">
+                  <div
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-900 mr-2"
+                  >
+                    <span class="font-semibold text-white">3</span>
+                  </div>
+                  <div>
+                    <p class="font-medium text-white">Análisis comparativo</p>
+                    <p class="text-xs text-gray-300">
+                      Benchmarking con otros mercados similares
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start method-step">
+                  <div
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-900 mr-2"
+                  >
+                    <span class="font-semibold text-white">4</span>
+                  </div>
+                  <div>
+                    <p class="font-medium text-white">
+                      Proyección de tendencias
+                    </p>
+                    <p class="text-xs text-gray-300">
+                      Modelos predictivos para escenarios 2026
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-4 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Periodo de estudio: Abril
+            2024 - Abril 2025
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 3
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="page_2.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 3 de 9</span>
+
+          <!-- Botón Siguiente -->
+          <a
+            href="page_4.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </a>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document
+          .getElementById("methodologyChart")
+          .getContext("2d");
+
+        const chart = new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: [
+              "Análisis Estadístico",
+              "Estudio Sectorial",
+              "Encuestas de Mercado",
+              "Entrevistas Expertos",
+              "Análisis Comparativo",
+              "Proyección de Tendencias",
+            ],
+            datasets: [
+              {
+                label: "Peso metodológico",
+                data: [90, 75, 65, 60, 80, 85],
+                backgroundColor: "rgba(78, 205, 196, 0.3)",
+                borderColor: "#4ECDC4",
+                borderWidth: 2,
+                pointBackgroundColor: "#4ECDC4",
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: "white",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#ffffff",
+                  font: {
+                    family: "Montserrat",
+                  },
+                  padding: 15,
+                },
+              },
+              title: {
+                display: true,
+                text: "Enfoque metodológico (peso sobre 100)",
+                color: "#ffffff",
+                font: {
+                  family: "Montserrat",
+                  size: 14,
+                },
+                padding: {
+                  bottom: 15,
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(10, 35, 66, 0.8)",
+                titleFont: {
+                  family: "Montserrat",
+                },
+                bodyFont: {
+                  family: "Montserrat",
+                },
+              },
+            },
+            scales: {
+              r: {
+                angleLines: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                pointLabels: {
+                  color: "#A7A9AC",
+                  font: {
+                    family: "Montserrat",
+                    size: 11,
+                  },
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  backdropColor: "transparent",
+                  font: {
+                    size: 9,
+                  },
+                },
+              },
+            },
+            animation: {
+              duration: 2000,
+              easing: "easeOutQuart",
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

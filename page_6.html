@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .factor-card {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        height: 100%;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .factor-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(to right, #4ecdc4, #56e8e0);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+      }
+      .factor-card:hover::after {
+        transform: scaleX(1);
+      }
+      .factor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .factor-header {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
+      }
+      .factor-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 80px);
+      }
+      .icon-circle {
+        width: 48px;
+        height: 48px;
+        background: rgba(78, 205, 196, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        transition: all 0.3s ease;
+      }
+      .factor-card:hover .icon-circle {
+        transform: scale(1.1);
+        background: rgba(78, 205, 196, 0.25);
+      }
+      .stat-highlight {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #4ecdc4;
+        line-height: 1;
+        margin: 12px 0 5px;
+      }
+      .chart-container {
+        height: 100px;
+        margin-top: auto;
+        margin-bottom: 10px;
+      }
+      .impact-meter {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      .impact-fill {
+        height: 100%;
+        background: linear-gradient(to right, #4ecdc4, #56e8e0);
+        border-radius: 3px;
+        transition: width 1.5s ease-out;
+      }
+      .impact-fill.medium {
+        background: linear-gradient(to right, #ffd166, #ffc233);
+      }
+      .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+      }
+      .badge-high {
+        background: rgba(78, 205, 196, 0.15);
+        color: #4ecdc4;
+      }
+      .badge-medium-high {
+        background: rgba(78, 205, 196, 0.1);
+        color: #4ecdc4;
+      }
+      .badge-medium {
+        background: rgba(255, 209, 102, 0.15);
+        color: #ffd166;
+      }
+      .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        padding: 6px;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      .feature-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .feature-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        background: rgba(78, 205, 196, 0.15);
+        flex-shrink: 0;
+      }
+      .circle-decoration {
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.1) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+        }
+      }
+      .fade-in {
+        animation: fadeIn 1s forwards;
+        opacity: 0;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="circle-decoration"></div>
+      <div class="content">
+        <h1 class="title">Factores de Influencia en el Mercado</h1>
+
+        <div class="grid grid-cols-5 gap-4 mt-5">
+          <!-- Factor 1: Turismo -->
+          <div class="factor-card fade-in" style="animation-delay: 0.1s">
+            <div class="factor-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="icon-circle pulse">
+                    <i class="fas fa-plane-arrival text-teal-400 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold">Turismo</h3>
+                  </div>
+                </div>
+                <div class="badge badge-high">
+                  <i class="fas fa-arrow-up mr-1"></i>Alto
+                </div>
+              </div>
+            </div>
+            <div class="factor-body">
+              <div class="stat-highlight">9.2M</div>
+              <p class="text-sm text-gray-300">visitantes en 2024</p>
+
+              <div class="feature-item mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-chart-line text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">+8.2% vs 2023</span>
+              </div>
+
+              <div class="mt-2 mb-2">
+                <p class="text-xs text-gray-300">
+                  Impulsa demanda de viviendas vacacionales y segunda residencia
+                </p>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="tourismChart"></canvas>
+              </div>
+
+              <div class="mt-2">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Impacto</span>
+                  <span>85%</span>
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factor 2: Inversión extranjera -->
+          <div class="factor-card fade-in" style="animation-delay: 0.2s">
+            <div class="factor-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="icon-circle">
+                    <i class="fas fa-globe-europe text-teal-400 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold">Inversión Extranjera</h3>
+                  </div>
+                </div>
+                <div class="badge badge-high">
+                  <i class="fas fa-arrow-up mr-1"></i>Alto
+                </div>
+              </div>
+            </div>
+            <div class="factor-body">
+              <div class="stat-highlight">25.1%</div>
+              <p class="text-sm text-gray-300">compradores extranjeros</p>
+
+              <div class="feature-item mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-percentage text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">+3.2% vs 2023</span>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-id-card text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">1.784 Golden Visas</span>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="foreignInvestmentChart"></canvas>
+              </div>
+
+              <div class="mt-2">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Impacto</span>
+                  <span>80%</span>
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factor 3: Nómadas digitales -->
+          <div class="factor-card fade-in" style="animation-delay: 0.3s">
+            <div class="factor-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="icon-circle">
+                    <i class="fas fa-laptop-house text-teal-400 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold">Nómadas Digitales</h3>
+                  </div>
+                </div>
+                <div class="badge badge-medium-high">
+                  <i class="fas fa-arrow-up mr-1"></i>Medio-Alto
+                </div>
+              </div>
+            </div>
+            <div class="factor-body">
+              <div class="stat-highlight">+45%</div>
+              <p class="text-sm text-gray-300">teletrabajadores en 2024</p>
+
+              <div class="feature-item mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-wifi text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200"
+                  >Las Palmas: top 10 destinos</span
+                >
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-home text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200"
+                  >Alquileres de larga estancia</span
+                >
+              </div>
+
+              <div class="chart-container">
+                <canvas id="digitalnomadsChart"></canvas>
+              </div>
+
+              <div class="mt-2">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Impacto</span>
+                  <span>65%</span>
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factor 4: Políticas gubernamentales -->
+          <div class="factor-card fade-in" style="animation-delay: 0.4s">
+            <div class="factor-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="icon-circle">
+                    <i class="fas fa-landmark text-teal-400 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold">Políticas</h3>
+                  </div>
+                </div>
+                <div class="badge badge-medium">
+                  <i class="fas fa-equals mr-1"></i>Medio
+                </div>
+              </div>
+            </div>
+            <div class="factor-body">
+              <div class="stat-highlight">336</div>
+              <p class="text-sm text-gray-300">nuevas viviendas públicas</p>
+
+              <div class="feature-item mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-file-alt text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">Decreto Ley 1/2024</span>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-hand-holding-usd text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">Ayudas al alquiler</span>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="housingPolicyChart"></canvas>
+              </div>
+
+              <div class="mt-2">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Impacto</span>
+                  <span>55%</span>
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill medium" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factor 5: Factores económicos -->
+          <div class="factor-card fade-in" style="animation-delay: 0.5s">
+            <div class="factor-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="icon-circle">
+                    <i class="fas fa-chart-pie text-teal-400 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold">Economía</h3>
+                  </div>
+                </div>
+                <div class="badge badge-high">
+                  <i class="fas fa-arrow-up mr-1"></i>Alto
+                </div>
+              </div>
+            </div>
+            <div class="factor-body">
+              <div class="stat-highlight">3.6%</div>
+              <p class="text-sm text-gray-300">crecimiento económico</p>
+
+              <div class="feature-item mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-briefcase text-teal-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200"
+                  >+8% empleo en el sector</span
+                >
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-euro-sign text-yellow-400 text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-200">6.3% inflación</span>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="economicFactorsChart"></canvas>
+              </div>
+
+              <div class="mt-2">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Impacto</span>
+                  <span>75%</span>
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 bg-white bg-opacity-5 p-3 rounded-lg">
+          <div class="grid grid-cols-5 gap-4">
+            <div class="text-center">
+              <div class="text-sm font-semibold mb-1">Turismo</div>
+              <div class="text-xs text-gray-300">
+                Impulsa ventas en zonas costeras
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-semibold mb-1">Inversión Extranjera</div>
+              <div class="text-xs text-gray-300">
+                Eleva precios en zonas premium
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-semibold mb-1">Nómadas Digitales</div>
+              <div class="text-xs text-gray-300">
+                Transforma barrios urbanos
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-semibold mb-1">Políticas Públicas</div>
+              <div class="text-xs text-gray-300">
+                Modera efectos especulativos
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-semibold mb-1">Economía Local</div>
+              <div class="text-xs text-gray-300">Facilita financiación</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-3 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Fuentes: ISTAC, INE, Consejo
+            General del Notariado, Gobierno de Canarias
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 6
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="page_5.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 6 de 9</span>
+
+          <!-- Botón Siguiente -->
+          <a
+            href="page_7.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </a>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+          // Set impact meters with animation
+          document.querySelectorAll(".impact-fill").forEach((meter, index) => {
+            const values = [85, 80, 65, 55, 75];
+            setTimeout(() => {
+              meter.style.width = values[index] + "%";
+            }, 300 * index);
+          });
+        }, 500);
+
+        // Tourism chart
+        const tourismCtx = document
+          .getElementById("tourismChart")
+          .getContext("2d");
+        const tourismChart = new Chart(tourismCtx, {
+          type: "line",
+          data: {
+            labels: ["2021", "2022", "2023", "2024"],
+            datasets: [
+              {
+                label: "Millones de visitantes",
+                data: [5.8, 7.4, 8.5, 9.2],
+                borderColor: "#4ECDC4",
+                backgroundColor: "rgba(78, 205, 196, 0.2)",
+                borderWidth: 2.5,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 3,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                display: false,
+                beginAtZero: false,
+              },
+              x: {
+                display: true,
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 8,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Foreign Investment chart
+        const foreignInvestmentCtx = document
+          .getElementById("foreignInvestmentChart")
+          .getContext("2d");
+        const foreignInvestmentChart = new Chart(foreignInvestmentCtx, {
+          type: "pie",
+          data: {
+            labels: ["Extranjeros", "Nacionales"],
+            datasets: [
+              {
+                data: [25.1, 74.9],
+                backgroundColor: [
+                  "rgba(78, 205, 196, 0.7)",
+                  "rgba(78, 205, 196, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(78, 205, 196, 1)",
+                  "rgba(78, 205, 196, 0.5)",
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            cutout: "50%",
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return context.label + ": " + context.raw + "%";
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Digital Nomads chart
+        const digitalnomadsCtx = document
+          .getElementById("digitalnomadsChart")
+          .getContext("2d");
+        const digitalnomadsChart = new Chart(digitalnomadsCtx, {
+          type: "bar",
+          data: {
+            labels: ["2022", "2023", "2024"],
+            datasets: [
+              {
+                label: "Nómadas digitales",
+                data: [4200, 5800, 8400],
+                backgroundColor: [
+                  "rgba(78, 205, 196, 0.4)",
+                  "rgba(78, 205, 196, 0.6)",
+                  "rgba(78, 205, 196, 0.8)",
+                ],
+                borderColor: [
+                  "rgba(78, 205, 196, 0.8)",
+                  "rgba(78, 205, 196, 0.9)",
+                  "rgba(78, 205, 196, 1)",
+                ],
+                borderWidth: 1,
+                borderRadius: 3,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                display: false,
+                beginAtZero: true,
+              },
+              x: {
+                display: true,
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 8,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Housing Policy chart
+        const housingPolicyCtx = document
+          .getElementById("housingPolicyChart")
+          .getContext("2d");
+        const housingPolicyChart = new Chart(housingPolicyCtx, {
+          type: "doughnut",
+          data: {
+            labels: ["Viviendas públicas", "Necesidad estimada"],
+            datasets: [
+              {
+                data: [336, 1500],
+                backgroundColor: [
+                  "rgba(255, 209, 102, 0.7)",
+                  "rgba(255, 209, 102, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(255, 209, 102, 1)",
+                  "rgba(255, 209, 102, 0.5)",
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            cutout: "65%",
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          },
+        });
+
+        // Economic Factors chart
+        const economicFactorsCtx = document
+          .getElementById("economicFactorsChart")
+          .getContext("2d");
+        const economicFactorsChart = new Chart(economicFactorsCtx, {
+          type: "radar",
+          data: {
+            labels: [
+              "Crecimiento",
+              "Empleo",
+              "Inflación",
+              "Inversión",
+              "Consumo",
+            ],
+            datasets: [
+              {
+                label: "Indicadores económicos",
+                data: [3.6, 8, 6.3, 7.2, 5.5],
+                backgroundColor: "rgba(78, 205, 196, 0.2)",
+                borderColor: "rgba(78, 205, 196, 0.8)",
+                borderWidth: 2,
+                pointBackgroundColor: "#4ECDC4",
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            elements: {
+              line: {
+                tension: 0.3,
+              },
+            },
+            scales: {
+              r: {
+                angleLines: {
+                  display: false,
+                },
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  display: false,
+                  backdropColor: "transparent",
+                },
+                pointLabels: {
+                  display: false,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

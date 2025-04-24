@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 25px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .section-title {
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 15px;
+      }
+      .section-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background-color: #4ecdc4;
+        border-radius: 2px;
+      }
+      .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        height: 250px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .chart-container:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.07);
+      }
+      .stat-card {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 16px;
+        height: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-left: 3px solid #4ecdc4;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #4ecdc4;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .impact-meter {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        margin: 8px 0;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .impact-fill {
+        height: 100%;
+        background: linear-gradient(to right, #4ecdc4, #56e8e0);
+        border-radius: 4px;
+        transition: width 1.5s ease-out;
+      }
+      .impact-fill.negative {
+        background: linear-gradient(to right, #ff6b6b, #ff8585);
+      }
+      .section-divider {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        margin: 15px 0;
+      }
+      .icon-circle {
+        width: 42px;
+        height: 42px;
+        background: rgba(78, 205, 196, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .icon-circle:hover {
+        transform: scale(1.1);
+        background: rgba(78, 205, 196, 0.25);
+      }
+      .circle-decoration {
+        position: absolute;
+        top: -150px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.1) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .data-badge {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 30px;
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        margin-right: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .data-badge:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+      }
+      .highlight-box {
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(10, 35, 66, 0.4);
+        border-left: 3px solid;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
+      .highlight-box:hover {
+        transform: translateX(3px);
+        background: rgba(10, 35, 66, 0.6);
+      }
+      .positive {
+        border-color: #4ecdc4;
+      }
+      .negative {
+        border-color: #ff6b6b;
+      }
+      .warning {
+        border-color: #ffd166;
+      }
+      .animated-number {
+        animation: countUp 2s forwards;
+      }
+      @keyframes countUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .pulse {
+        box-shadow: 0 0 0 rgba(78, 205, 196, 0.4);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="circle-decoration"></div>
+      <div class="content">
+        <h1 class="title">Impacto Económico y Social</h1>
+
+        <div class="grid grid-cols-2 gap-6 mt-5 z-10">
+          <!-- Left column: Economic Impact -->
+          <div>
+            <div class="flex items-center section-title">
+              <div class="icon-circle pulse">
+                <i class="fas fa-chart-pie text-teal-400 text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">
+                Impacto Económico
+              </h2>
+            </div>
+
+            <div class="chart-container mb-4">
+              <canvas id="economicImpactChart"></canvas>
+            </div>
+
+            <div class="flex justify-center gap-3 mb-4">
+              <div class="data-badge">
+                <i class="fas fa-arrow-up text-teal-400 mr-1"></i>
+                <span
+                  ><span class="text-teal-400">€825M</span> inversión
+                  inmobiliaria</span
+                >
+              </div>
+              <div class="data-badge">
+                <i class="fas fa-percentage text-teal-400 mr-1"></i>
+                <span><span class="text-teal-400">+18.4%</span> vs 2023</span>
+              </div>
+            </div>
+
+            <div class="bg-white bg-opacity-5 p-4 rounded-lg shadow-lg">
+              <h4 class="font-medium text-white mb-3 flex items-center">
+                <i class="fas fa-briefcase text-teal-400 mr-2"></i>
+                Generación de Empleo en el Sector
+              </h4>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div
+                  class="bg-white bg-opacity-5 p-3 rounded-lg flex items-center"
+                >
+                  <div class="rounded-full bg-teal-400 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-user-tie text-teal-400"></i>
+                  </div>
+                  <div>
+                    <div
+                      class="text-2xl font-bold text-teal-400 animated-number"
+                    >
+                      12.840
+                    </div>
+                    <div class="text-xs text-gray-300">Empleos directos</div>
+                  </div>
+                </div>
+                <div
+                  class="bg-white bg-opacity-5 p-3 rounded-lg flex items-center"
+                >
+                  <div class="rounded-full bg-teal-400 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-users text-teal-400"></i>
+                  </div>
+                  <div>
+                    <div
+                      class="text-2xl font-bold text-teal-400 animated-number"
+                    >
+                      18.650
+                    </div>
+                    <div class="text-xs text-gray-300">Empleos indirectos</div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-2 bg-white bg-opacity-5 rounded-lg"
+              >
+                <div class="text-sm">Crecimiento anual de empleo</div>
+                <div class="flex items-center">
+                  <i class="fas fa-arrow-up text-teal-400 mr-1"></i>
+                  <span class="text-teal-400 font-semibold">+8%</span>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Contribución al PIB local</span>
+                  <span class="font-semibold"
+                    >14.5%
+                    <span class="text-teal-400">(+2.3% vs 2023)</span></span
+                  >
+                </div>
+                <div class="impact-meter">
+                  <div class="impact-fill" style="width: 14.5%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: Social Impact -->
+          <div>
+            <div class="flex items-center section-title">
+              <div class="icon-circle pulse">
+                <i class="fas fa-users text-teal-400 text-xl"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-white">Impacto Social</h2>
+            </div>
+
+            <div class="chart-container mb-4">
+              <canvas id="socialImpactChart"></canvas>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-white bg-opacity-5 p-4 rounded-lg shadow-lg">
+                <h4 class="font-medium text-white mb-3 flex items-center">
+                  <i class="fas fa-home text-red-400 mr-2"></i>
+                  Esfuerzo Familiar
+                </h4>
+
+                <div class="mb-3">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="text-sm">Para compra de vivienda</div>
+                    <div class="text-sm font-semibold text-yellow-400">
+                      42.5%
+                    </div>
+                  </div>
+                  <div class="impact-meter">
+                    <div
+                      class="impact-fill negative"
+                      style="width: 42.5%"
+                    ></div>
+                  </div>
+                  <div class="text-xs text-gray-400 text-right">
+                    de ingresos mensuales
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="text-sm">Para alquiler de vivienda</div>
+                    <div class="text-sm font-semibold text-red-400">48.3%</div>
+                  </div>
+                  <div class="impact-meter">
+                    <div
+                      class="impact-fill negative"
+                      style="width: 48.3%"
+                    ></div>
+                  </div>
+                  <div class="text-xs text-gray-400 text-right">
+                    de ingresos mensuales
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white bg-opacity-5 p-4 rounded-lg shadow-lg">
+                <h4 class="font-medium text-white mb-3 flex items-center">
+                  <i class="fas fa-search-location text-yellow-400 mr-2"></i>
+                  Disponibilidad de Vivienda
+                </h4>
+
+                <div class="flex justify-center items-center mb-3">
+                  <div
+                    class="rounded-full w-20 h-20 border-4 border-red-400 flex items-center justify-center"
+                  >
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-red-400">0.7%</div>
+                      <div class="text-xs text-gray-400">disponible</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div class="text-center bg-white bg-opacity-5 p-2 rounded">
+                    <div class="text-xl font-bold text-white">4.6</div>
+                    <div class="text-xs text-gray-400">
+                      meses salario/entrada
+                    </div>
+                  </div>
+                  <div class="text-center bg-white bg-opacity-5 p-2 rounded">
+                    <div class="text-xl font-bold text-white">28.4</div>
+                    <div class="text-xs text-gray-400">años hipoteca media</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <h4 class="font-medium text-white mb-2 flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-400 mr-2"></i>
+                Principales Desafíos
+              </h4>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="highlight-box negative">
+                  <div class="text-sm font-medium text-white mb-1">
+                    Divergencia precios-salarios
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    Aumento de precios (+12.7%) vs. salarios (+3.2%)
+                  </div>
+                </div>
+                <div class="highlight-box warning">
+                  <div class="text-sm font-medium text-white mb-1">
+                    Gentrificación
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    Expulsión de residentes locales de zonas centrales
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-3 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Fuentes: ISTAC, INE,
+            Ayuntamiento de Las Palmas de GC, Asociación Canaria de Promotores
+            Inmobiliarios
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 7
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="page_6.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 7 de 9</span>
+
+          <!-- Botón Siguiente -->
+          <a
+            href="page_8.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </a>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize animated counters
+        const animateValue = (element, start, end, duration) => {
+          let startTimestamp = null;
+          const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min(
+              (timestamp - startTimestamp) / duration,
+              1
+            );
+            const value = Math.floor(progress * (end - start) + start);
+            element.textContent = value.toLocaleString("es-ES");
+            if (progress < 1) {
+              window.requestAnimationFrame(step);
+            }
+          };
+          window.requestAnimationFrame(step);
+        };
+
+        setTimeout(() => {
+          document.querySelectorAll(".animated-number").forEach((el) => {
+            const value = parseFloat(
+              el.textContent.replace(".", "").replace(",", ".")
+            );
+            animateValue(el, 0, value, 1500);
+          });
+
+          document.querySelectorAll(".impact-fill").forEach((el) => {
+            const finalWidth = el.style.width;
+            el.style.width = "0%";
+            setTimeout(() => {
+              el.style.width = finalWidth;
+            }, 300);
+          });
+        }, 500);
+
+        // Economic Impact Chart
+        const economicCtx = document
+          .getElementById("economicImpactChart")
+          .getContext("2d");
+
+        const gradientFill = economicCtx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, "rgba(78, 205, 196, 0.6)");
+        gradientFill.addColorStop(1, "rgba(78, 205, 196, 0.1)");
+
+        const economicChart = new Chart(economicCtx, {
+          type: "bar",
+          data: {
+            labels: ["2021", "2022", "2023", "2024", "2025 (Proy.)"],
+            datasets: [
+              {
+                label: "Inversión inmobiliaria (M€)",
+                data: [520, 645, 712, 825, 910],
+                backgroundColor: gradientFill,
+                borderColor: "#4ECDC4",
+                borderWidth: 1,
+                borderRadius: 5,
+                order: 2,
+              },
+              {
+                label: "Contribución al PIB local (%)",
+                data: [10.2, 11.8, 12.7, 14.5, 15.8],
+                type: "line",
+                backgroundColor: "rgba(255, 107, 107, 0.2)",
+                borderColor: "#FF6B6B",
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: "#FF6B6B",
+                pointBorderColor: "white",
+                pointBorderWidth: 2,
+                tension: 0.4,
+                yAxisID: "y1",
+                order: 1,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  color: "#ffffff",
+                  padding: 15,
+                  usePointStyle: true,
+                  font: {
+                    family: "Montserrat",
+                    size: 11,
+                  },
+                },
+              },
+              title: {
+                display: true,
+                text: "Inversión inmobiliaria y contribución al PIB local",
+                color: "#ffffff",
+                font: {
+                  family: "Montserrat",
+                  size: 14,
+                  weight: "normal",
+                },
+                padding: {
+                  bottom: 10,
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(10, 35, 66, 0.8)",
+                titleFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                bodyFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: true,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                  callback: function (value) {
+                    return value + " M€";
+                  },
+                },
+              },
+              y1: {
+                position: "right",
+                grid: {
+                  drawOnChartArea: false,
+                },
+                beginAtZero: true,
+                max: 20,
+                ticks: {
+                  color: "#FF6B6B",
+                  font: {
+                    size: 10,
+                  },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
+              },
+              x: {
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+            },
+            animations: {
+              tension: {
+                duration: 1000,
+                easing: "linear",
+              },
+            },
+          },
+        });
+
+        // Social Impact Chart
+        const socialCtx = document
+          .getElementById("socialImpactChart")
+          .getContext("2d");
+
+        // Create gradient for housing prices
+        const housingGradient = socialCtx.createLinearGradient(0, 0, 0, 400);
+        housingGradient.addColorStop(0, "rgba(78, 205, 196, 0.3)");
+        housingGradient.addColorStop(1, "rgba(78, 205, 196, 0.0)");
+
+        // Create gradient for salaries
+        const salaryGradient = socialCtx.createLinearGradient(0, 0, 0, 400);
+        salaryGradient.addColorStop(0, "rgba(255, 107, 107, 0.3)");
+        salaryGradient.addColorStop(1, "rgba(255, 107, 107, 0.0)");
+
+        const socialChart = new Chart(socialCtx, {
+          type: "line",
+          data: {
+            labels: ["2020", "2021", "2022", "2023", "2024", "2025 (Proy.)"],
+            datasets: [
+              {
+                label: "Precio medio vivienda (€/m²)",
+                data: [1950, 2060, 2170, 2380, 2580, 2750],
+                borderColor: "#4ECDC4",
+                backgroundColor: housingGradient,
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: "#4ECDC4",
+                pointBorderColor: "white",
+                pointBorderWidth: 2,
+              },
+              {
+                label: "Salario medio anual (€/100)",
+                data: [2230, 2250, 2280, 2320, 2390, 2450],
+                borderColor: "#FF6B6B",
+                backgroundColor: salaryGradient,
+                borderWidth: 3,
+                borderDash: [5, 5],
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointStyle: "circle",
+                pointBackgroundColor: "#FF6B6B",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  color: "#ffffff",
+                  usePointStyle: true,
+                  padding: 15,
+                  font: {
+                    family: "Montserrat",
+                    size: 11,
+                  },
+                },
+              },
+              title: {
+                display: true,
+                text: "Divergencia entre precios de vivienda y salarios",
+                color: "#ffffff",
+                font: {
+                  family: "Montserrat",
+                  size: 14,
+                  weight: "normal",
+                },
+                padding: {
+                  bottom: 10,
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(10, 35, 66, 0.8)",
+                titleFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                bodyFont: {
+                  family: "Montserrat",
+                  size: 12,
+                },
+                padding: 10,
+                cornerRadius: 6,
+              },
+            },
+            interaction: {
+              mode: "index",
+              intersect: false,
+            },
+            scales: {
+              y: {
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                  callback: function (value) {
+                    return value + " €";
+                  },
+                },
+              },
+              x: {
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+            },
+            animations: {
+              tension: {
+                duration: 1000,
+                easing: "linear",
+              },
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

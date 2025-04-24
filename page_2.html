@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+      .slide {
+        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
+        /* min-height: 720px; <-- Elimina o comenta esta línea */
+        height: 100vh; /* <-- Añade esta línea */
+        position: relative;
+        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        background: linear-gradient(
+          135deg,
+          #0a2342 0%,
+          #1a3c61 50%,
+          #0f3156 100%
+        );
+        color: white;
+        /* Asegúrate de que body no tenga márgenes que interfieran */
+      }
+
+      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
+        font-family: "Montserrat", sans-serif;
+      }
+      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        padding: 70px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
+        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
+        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
+        height: 100%;
+        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+      }
+      .content {
+        padding: 50px 60px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background-color: #4ecdc4;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.07);
+        border-left: 4px solid #4ecdc4;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #4ecdc4;
+      }
+      .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        height: 250px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+      }
+      .chart-container:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .decorative-shape {
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.2) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+      }
+      .stat-highlight {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(78, 205, 196, 0.15);
+        padding: 4px 10px;
+        border-radius: 4px;
+        margin: 4px 0;
+        font-weight: 500;
+      }
+      .stat-value {
+        color: #4ecdc4;
+        font-weight: 700;
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide">
+      <div class="decorative-shape"></div>
+      <div class="content">
+        <h1 class="title">Resumen Ejecutivo</h1>
+
+        <div class="grid grid-cols-2 gap-6 mt-8 z-10">
+          <div class="flex flex-col">
+            <div class="card">
+              <h3 class="card-title">
+                <i class="fas fa-file-alt mr-2"></i>Resumen del Estudio
+              </h3>
+              <p class="text-gray-200">
+                El mercado inmobiliario en Las Palmas de Gran Canaria
+                experimentó un crecimiento significativo, con un incremento del
+                12.7% en el valor del metro cuadrado durante 2024, alcanzando
+                los 2.482 €/m².
+              </p>
+
+              <div class="mt-3 space-y-2">
+                <div class="stat-highlight">
+                  <i class="fas fa-euro-sign text-teal-400 mr-1"></i>
+                  Precio actual: <span class="stat-value">2.580 €/m²</span>
+                </div>
+                <div class="stat-highlight">
+                  <i class="fas fa-exchange-alt text-teal-400 mr-1"></i>
+                  Volumen de transacciones:
+                  <span class="stat-value">5.340</span>
+                </div>
+                <div class="stat-highlight">
+                  <i class="fas fa-clock text-teal-400 mr-1"></i>
+                  Tiempo medio de venta: <span class="stat-value">48 días</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">
+                <i class="fas fa-bullseye mr-2"></i>Objetivos y Alcance
+              </h3>
+              <ul class="text-gray-200 list-disc pl-5 space-y-1">
+                <li>
+                  Analizar las tendencias del mercado inmobiliario (Abr 2024-Abr
+                  2025)
+                </li>
+                <li>
+                  Identificar factores de influencia: demografía, turismo e
+                  inversión extranjera
+                </li>
+                <li>Proyectar escenarios para el año 2026</li>
+                <li>Ofrecer recomendaciones estratégicas para inversores</li>
+              </ul>
+              <div class="mt-3 p-2 bg-white bg-opacity-5 rounded-md">
+                <p class="text-sm text-gray-300">
+                  <i class="fas fa-search mr-1"></i>
+                  <strong>Metodología:</strong> Análisis estadístico de datos
+                  oficiales, encuestas de mercado y entrevistas a expertos del
+                  sector inmobiliario de Las Palmas.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col">
+            <div class="card">
+              <h3 class="card-title">
+                <i class="fas fa-chart-line mr-2"></i>Importancia para la
+                Economía Local
+              </h3>
+              <p class="text-gray-200 mb-3">
+                El sector inmobiliario representa un pilar fundamental de la
+                economía de Las Palmas, generando:
+              </p>
+              <div class="flex justify-between text-center">
+                <div class="px-4">
+                  <div class="text-4xl text-teal-400 font-bold">25.1%</div>
+                  <div class="text-xs text-gray-300 mt-1">
+                    Compraventas por inversores extranjeros
+                  </div>
+                </div>
+                <div class="px-4">
+                  <div class="text-4xl text-teal-400 font-bold">8%</div>
+                  <div class="text-xs text-gray-300 mt-1">
+                    Incremento del empleo en el sector
+                  </div>
+                </div>
+                <div class="px-4">
+                  <div class="text-4xl text-teal-400 font-bold">6.3%</div>
+                  <div class="text-xs text-gray-300 mt-1">
+                    Crecimiento anual previsto
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 p-3 bg-white bg-opacity-5 rounded-md">
+                <h4 class="text-sm font-semibold text-white mb-2">
+                  Contribución Económica
+                </h4>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="flex items-center">
+                    <div
+                      class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                    >
+                      <i class="fas fa-percentage text-teal-400"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">14.5% del PIB</div>
+                      <div class="text-xs text-gray-400">
+                        Contribución local
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <div
+                      class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                    >
+                      <i class="fas fa-briefcase text-teal-400"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">12,840 empleos</div>
+                      <div class="text-xs text-gray-400">Directos creados</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-container">
+              <canvas id="priceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-auto text-sm text-gray-400 pt-4 flex items-center justify-between"
+        >
+          <div>
+            <i class="fas fa-info-circle mr-1"></i> Fuentes: Idealista,
+            Tecnocasa, Consejo General del Notariado, ISTAC 2024-2025
+          </div>
+          <div>
+            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 2
+          </div>
+        </div>
+        <!-- ****** INICIO PAGINACIÓN ****** -->
+        <div
+          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
+        >
+          <!-- Botón Anterior -->
+          <a
+            href="index.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            <i class="fas fa-chevron-left mr-2"></i> Anterior
+          </a>
+
+          <!-- Indicador de Página -->
+          <span class="text-gray-300 font-medium">Página 2 de 9</span>
+
+          <!-- Botón Siguiente -->
+          <a
+            href="page_3.html"
+            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+          >
+            Siguiente <i class="fas fa-chevron-right ml-2"></i>
+          </a>
+        </div>
+        <!-- ****** FIN PAGINACIÓN ****** -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById("priceChart").getContext("2d");
+
+        const chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: [
+              "Abr 24",
+              "Jun 24",
+              "Ago 24",
+              "Oct 24",
+              "Dic 24",
+              "Feb 25",
+              "Abr 25",
+            ],
+            datasets: [
+              {
+                label: "Precio medio por m² (€)",
+                data: [2167, 2240, 2340, 2405, 2482, 2530, 2580],
+                backgroundColor: "rgba(78, 205, 196, 0.2)",
+                borderColor: "#4ECDC4",
+                borderWidth: 3,
+                tension: 0.4,
+                pointBackgroundColor: "#4ECDC4",
+                pointRadius: 4,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#ffffff",
+                  font: {
+                    size: 12,
+                    family: "Montserrat",
+                  },
+                },
+              },
+              title: {
+                display: true,
+                text: "Evolución del precio medio de la vivienda (+12.7% en 12 meses)",
+                color: "#ffffff",
+                font: {
+                  size: 14,
+                  family: "Montserrat",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                min: 2000,
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                  callback: function (value) {
+                    return value + " €";
+                  },
+                },
+              },
+              x: {
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+                ticks: {
+                  color: "#A7A9AC",
+                },
+              },
+            },
+            animation: {
+              duration: 2000,
+              easing: "easeOutQuart",
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
