@@ -22,12 +22,16 @@
         padding: 0;
         font-family: "Montserrat", sans-serif;
       }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Montserrat", sans-serif;
+      }
       .slide {
-        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
-        /* min-height: 720px; <-- Elimina o comenta esta línea */
-        height: 100vh; /* <-- Añade esta línea */
+        min-height: 100vh;
         position: relative;
-        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
         background: linear-gradient(
           135deg,
           #0a2342 0%,
@@ -35,46 +39,21 @@
           #0f3156 100%
         );
         color: white;
-        /* Asegúrate de que body no tenga márgenes que interfieran */
       }
-
-      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
-        font-family: "Montserrat", sans-serif;
-      }
-      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Montserrat", sans-serif;
-      }
-
       .content {
         position: relative;
         z-index: 2;
-        padding: 70px 60px;
+        padding: 4vh 3vw;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
-        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
-        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
-        height: 100%;
-        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
-      }
-      .content {
-        padding: 50px 60px;
-        height: 100%;
+        min-height: 100%;
+        box-sizing: border-box;
       }
       .title {
-        font-size: 2.2rem;
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
         font-weight: 600;
         color: white;
-        margin-bottom: 30px;
+        margin-bottom: 2vh;
         position: relative;
       }
       .title::after {
@@ -116,26 +95,26 @@
         background: rgba(255, 255, 255, 0.09);
       }
       .factor-header {
-        padding: 16px;
+        padding: 2vh 2vw;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: relative;
         z-index: 1;
       }
       .factor-body {
-        padding: 16px;
+        padding: 2vh 2vw;
         display: flex;
         flex-direction: column;
         height: calc(100% - 80px);
       }
       .icon-circle {
-        width: 48px;
-        height: 48px;
+        width: clamp(40px, 6vw, 48px);
+        height: clamp(40px, 6vw, 48px);
         background: rgba(78, 205, 196, 0.15);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        margin-right: 2vw;
         transition: all 0.3s ease;
       }
       .factor-card:hover .icon-circle {
@@ -143,22 +122,22 @@
         background: rgba(78, 205, 196, 0.25);
       }
       .stat-highlight {
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         font-weight: 700;
         color: #4ecdc4;
         line-height: 1;
-        margin: 12px 0 5px;
+        margin: 1vh 0 0.5vh;
       }
       .chart-container {
-        height: 100px;
+        height: clamp(80px, 12vh, 100px);
         margin-top: auto;
-        margin-bottom: 10px;
+        margin-bottom: 1vh;
       }
       .impact-meter {
         height: 6px;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 3px;
-        margin-top: 10px;
+        margin-top: 1vh;
         overflow: hidden;
       }
       .impact-fill {
@@ -171,9 +150,9 @@
         background: linear-gradient(to right, #ffd166, #ffc233);
       }
       .badge {
-        padding: 4px 12px;
+        padding: 0.5vh 1.5vw;
         border-radius: 20px;
-        font-size: 0.75rem;
+        font-size: clamp(0.6rem, 1.5vw, 0.75rem);
         font-weight: 600;
         display: inline-flex;
         align-items: center;
@@ -193,8 +172,8 @@
       .feature-item {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
-        padding: 6px;
+        margin-bottom: 1vh;
+        padding: 0.8vh;
         border-radius: 4px;
         transition: all 0.2s;
       }
@@ -202,13 +181,13 @@
         background: rgba(255, 255, 255, 0.05);
       }
       .feature-icon {
-        width: 28px;
-        height: 28px;
+        width: clamp(24px, 3vw, 28px);
+        height: clamp(24px, 3vw, 28px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 10px;
+        margin-right: 1.5vw;
         background: rgba(78, 205, 196, 0.15);
         flex-shrink: 0;
       }
@@ -254,6 +233,51 @@
           transform: translateY(0);
         }
       }
+      .summary-text {
+        margin-top: 1vh;
+        font-size: 0.75rem;
+        color: #d1d5db;
+      }
+      /* Mobile-First Styles */
+      .grid-cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2vh;
+        margin-top: 2vh;
+      }
+      .pagination {
+        margin-top: 3vh;
+        padding-top: 2vh;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2vh;
+        text-align: center;
+      }
+      /* Responsive Styles for Larger Screens */
+      @media (min-width: 640px) {
+        /* sm breakpoint */
+        .grid-cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .pagination {
+          flex-direction: row;
+          justify-content: space-between;
+        }
+      }
+      @media (min-width: 768px) {
+        /* md breakpoint */
+        .grid-cards {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (min-width: 1024px) {
+        /* lg breakpoint */
+        .grid-cards {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
     </style>
   </head>
   <body>
@@ -262,7 +286,7 @@
       <div class="content">
         <h1 class="title">Factores de Influencia en el Mercado</h1>
 
-        <div class="grid grid-cols-5 gap-4 mt-5">
+        <div class="grid-cards">
           <!-- Factor 1: Turismo -->
           <div class="factor-card fade-in" style="animation-delay: 0.1s">
             <div class="factor-header">
@@ -300,8 +324,14 @@
               <div class="chart-container">
                 <canvas id="tourismChart"></canvas>
               </div>
-
               <div class="mt-2">
+                <div class="feature-icon">
+                  <i class="fas fa-chart-line text-teal-400 text-xs"></i>
+                </div>
+                <p class="summary-text">Impulsa ventas en zonas costeras</p>
+              </div>
+
+              <div class="mt-2 mb-2">
                 <div class="flex justify-between text-xs mb-1">
                   <span>Impacto</span>
                   <span>85%</span>
@@ -347,6 +377,8 @@
                 </div>
                 <span class="text-xs text-gray-200">1.784 Golden Visas</span>
               </div>
+
+              <p class="summary-text">Incrementa precios en áreas premium</p>
 
               <div class="chart-container">
                 <canvas id="foreignInvestmentChart"></canvas>
@@ -403,6 +435,8 @@
                 >
               </div>
 
+              <p class="summary-text">Aumenta demanda de alquileres</p>
+
               <div class="chart-container">
                 <canvas id="digitalnomadsChart"></canvas>
               </div>
@@ -453,6 +487,8 @@
                 </div>
                 <span class="text-xs text-gray-200">Ayudas al alquiler</span>
               </div>
+
+              <p class="summary-text">Mejora acceso a vivienda asequible</p>
 
               <div class="chart-container">
                 <canvas id="housingPolicyChart"></canvas>
@@ -507,6 +543,8 @@
                 <span class="text-xs text-gray-200">6.3% inflación</span>
               </div>
 
+              <p class="summary-text">Influye en capacidad de compra</p>
+
               <div class="chart-container">
                 <canvas id="economicFactorsChart"></canvas>
               </div>
@@ -524,66 +562,14 @@
           </div>
         </div>
 
-        <div class="mt-6 bg-white bg-opacity-5 p-3 rounded-lg">
-          <div class="grid grid-cols-5 gap-4">
-            <div class="text-center">
-              <div class="text-sm font-semibold mb-1">Turismo</div>
-              <div class="text-xs text-gray-300">
-                Impulsa ventas en zonas costeras
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="text-sm font-semibold mb-1">Inversión Extranjera</div>
-              <div class="text-xs text-gray-300">
-                Eleva precios en zonas premium
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="text-sm font-semibold mb-1">Nómadas Digitales</div>
-              <div class="text-xs text-gray-300">
-                Transforma barrios urbanos
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="text-sm font-semibold mb-1">Políticas Públicas</div>
-              <div class="text-xs text-gray-300">
-                Modera efectos especulativos
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="text-sm font-semibold mb-1">Economía Local</div>
-              <div class="text-xs text-gray-300">Facilita financiación</div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="mt-auto text-sm text-gray-400 pt-3 flex items-center justify-between"
-        >
-          <div>
-            <i class="fas fa-info-circle mr-1"></i> Fuentes: ISTAC, INE, Consejo
-            General del Notariado, Gobierno de Canarias
-          </div>
-          <div>
-            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 6
-          </div>
-        </div>
-        <!-- ****** INICIO PAGINACIÓN ****** -->
-        <div
-          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
-        >
-          <!-- Botón Anterior -->
+        <div class="pagination">
           <a
             href="page_5.html"
             class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
           >
             <i class="fas fa-chevron-left mr-2"></i> Anterior
           </a>
-
-          <!-- Indicador de Página -->
           <span class="text-gray-300 font-medium">Página 6 de 9</span>
-
-          <!-- Botón Siguiente -->
           <a
             href="page_7.html"
             class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
@@ -591,257 +577,232 @@
             Siguiente <i class="fas fa-chevron-right ml-2"></i>
           </a>
         </div>
-        <!-- ****** FIN PAGINACIÓN ****** -->
       </div>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(() => {
-          // Set impact meters with animation
-          document.querySelectorAll(".impact-fill").forEach((meter, index) => {
-            const values = [85, 80, 65, 55, 75];
-            setTimeout(() => {
-              meter.style.width = values[index] + "%";
-            }, 300 * index);
-          });
-        }, 500);
-
         // Tourism chart
         const tourismCtx = document
           .getElementById("tourismChart")
           .getContext("2d");
-        const tourismChart = new Chart(tourismCtx, {
+        new Chart(tourismCtx, {
           type: "line",
           data: {
-            labels: ["2021", "2022", "2023", "2024"],
+            labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
             datasets: [
               {
-                label: "Millones de visitantes",
-                data: [5.8, 7.4, 8.5, 9.2],
+                label: "Visitantes (M)",
+                data: [8.3, 4.2, 5.6, 7.8, 8.5, 9.2],
                 borderColor: "#4ECDC4",
                 backgroundColor: "rgba(78, 205, 196, 0.2)",
-                borderWidth: 2.5,
-                tension: 0.4,
                 fill: true,
+                tension: 0.3,
+                borderWidth: 2,
                 pointRadius: 3,
+                pointBackgroundColor: "#4ECDC4",
               },
             ],
           },
           options: {
+            responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
+              tooltip: { enabled: false },
             },
             scales: {
-              y: {
-                display: false,
-                beginAtZero: false,
-              },
               x: {
-                display: true,
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  color: "#A7A9AC",
-                  font: {
-                    size: 8,
-                  },
-                },
+                grid: { display: false },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+              },
+              y: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+                beginAtZero: true,
               },
             },
           },
         });
 
         // Foreign Investment chart
-        const foreignInvestmentCtx = document
+        const foreignCtx = document
           .getElementById("foreignInvestmentChart")
           .getContext("2d");
-        const foreignInvestmentChart = new Chart(foreignInvestmentCtx, {
-          type: "pie",
+        new Chart(foreignCtx, {
+          type: "line",
           data: {
-            labels: ["Extranjeros", "Nacionales"],
+            labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
             datasets: [
               {
-                data: [25.1, 74.9],
-                backgroundColor: [
-                  "rgba(78, 205, 196, 0.7)",
-                  "rgba(78, 205, 196, 0.2)",
-                ],
-                borderColor: [
-                  "rgba(78, 205, 196, 1)",
-                  "rgba(78, 205, 196, 0.5)",
-                ],
-                borderWidth: 1,
+                label: "Compradores extranjeros (%)",
+                data: [18.2, 16.5, 19.8, 21.9, 23.5, 25.1],
+                borderColor: "#4ECDC4",
+                backgroundColor: "rgba(78, 205, 196, 0.2)",
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#4ECDC4",
               },
             ],
           },
           options: {
+            responsive: true,
             maintainAspectRatio: false,
-            cutout: "50%",
             plugins: {
-              legend: {
-                display: false,
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
               },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return context.label + ": " + context.raw + "%";
-                  },
-                },
+              y: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+                beginAtZero: true,
               },
             },
           },
         });
 
         // Digital Nomads chart
-        const digitalnomadsCtx = document
+        const nomadsCtx = document
           .getElementById("digitalnomadsChart")
           .getContext("2d");
-        const digitalnomadsChart = new Chart(digitalnomadsCtx, {
-          type: "bar",
+        new Chart(nomadsCtx, {
+          type: "line",
           data: {
-            labels: ["2022", "2023", "2024"],
+            labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
             datasets: [
               {
-                label: "Nómadas digitales",
-                data: [4200, 5800, 8400],
-                backgroundColor: [
-                  "rgba(78, 205, 196, 0.4)",
-                  "rgba(78, 205, 196, 0.6)",
-                  "rgba(78, 205, 196, 0.8)",
-                ],
-                borderColor: [
-                  "rgba(78, 205, 196, 0.8)",
-                  "rgba(78, 205, 196, 0.9)",
-                  "rgba(78, 205, 196, 1)",
-                ],
-                borderWidth: 1,
-                borderRadius: 3,
+                label: "Crecimiento (%)",
+                data: [5, 10, 20, 25, 30, 45],
+                borderColor: "#4ECDC4",
+                backgroundColor: "rgba(78, 205, 196, 0.2)",
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#4ECDC4",
               },
             ],
           },
           options: {
+            responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
+              tooltip: { enabled: false },
             },
             scales: {
-              y: {
-                display: false,
-                beginAtZero: true,
-              },
               x: {
-                display: true,
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  color: "#A7A9AC",
-                  font: {
-                    size: 8,
-                  },
-                },
+                grid: { display: false },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+              },
+              y: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+                beginAtZero: true,
               },
             },
           },
         });
 
         // Housing Policy chart
-        const housingPolicyCtx = document
+        const policyCtx = document
           .getElementById("housingPolicyChart")
           .getContext("2d");
-        const housingPolicyChart = new Chart(housingPolicyCtx, {
-          type: "doughnut",
+        new Chart(policyCtx, {
+          type: "bar",
           data: {
-            labels: ["Viviendas públicas", "Necesidad estimada"],
+            labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
             datasets: [
               {
-                data: [336, 1500],
-                backgroundColor: [
-                  "rgba(255, 209, 102, 0.7)",
-                  "rgba(255, 209, 102, 0.2)",
-                ],
-                borderColor: [
-                  "rgba(255, 209, 102, 1)",
-                  "rgba(255, 209, 102, 0.5)",
-                ],
+                label: "Viviendas públicas",
+                data: [180, 210, 250, 280, 310, 336],
+                backgroundColor: "rgba(78, 205, 196, 0.6)",
+                borderColor: "#4ECDC4",
                 borderWidth: 1,
+                borderRadius: 3,
               },
             ],
           },
           options: {
+            responsive: true,
             maintainAspectRatio: false,
-            cutout: "65%",
             plugins: {
-              legend: {
-                display: false,
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+              },
+              y: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+                beginAtZero: true,
               },
             },
           },
         });
 
         // Economic Factors chart
-        const economicFactorsCtx = document
+        const economicCtx = document
           .getElementById("economicFactorsChart")
           .getContext("2d");
-        const economicFactorsChart = new Chart(economicFactorsCtx, {
-          type: "radar",
+        new Chart(economicCtx, {
+          type: "line",
           data: {
-            labels: [
-              "Crecimiento",
-              "Empleo",
-              "Inflación",
-              "Inversión",
-              "Consumo",
-            ],
+            labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
             datasets: [
               {
-                label: "Indicadores económicos",
-                data: [3.6, 8, 6.3, 7.2, 5.5],
+                label: "Crecimiento económico (%)",
+                data: [2.8, -1.2, 2.5, 3.1, 3.3, 3.6],
+                borderColor: "#4ECDC4",
                 backgroundColor: "rgba(78, 205, 196, 0.2)",
-                borderColor: "rgba(78, 205, 196, 0.8)",
+                fill: true,
+                tension: 0.3,
                 borderWidth: 2,
+                pointRadius: 3,
                 pointBackgroundColor: "#4ECDC4",
               },
             ],
           },
           options: {
+            responsive: true,
             maintainAspectRatio: false,
-            elements: {
-              line: {
-                tension: 0.3,
-              },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
             },
             scales: {
-              r: {
-                angleLines: {
-                  display: false,
-                },
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: false,
-                  backdropColor: "transparent",
-                },
-                pointLabels: {
-                  display: false,
-                },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
               },
-            },
-            plugins: {
-              legend: {
-                display: false,
+              y: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#A7A9AC", font: { size: 10 } },
+                beginAtZero: false,
               },
             },
           },
         });
+
+        // Animate impact meters
+        setTimeout(function () {
+          document.querySelectorAll(".impact-fill").forEach((fill) => {
+            const percentage = fill.parentElement
+              .querySelector("span:last-child")
+              .textContent.replace("%", "");
+            fill.style.width = percentage + "%";
+          });
+        }, 500);
       });
     </script>
   </body>

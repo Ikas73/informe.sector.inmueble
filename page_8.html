@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proyecciones 2026 - Análisis Inmobiliario LPGC</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -17,180 +18,158 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+      /* Estilos base (Mobile First) - Consolidados y Limpios */
+      html,
       body {
         margin: 0;
         padding: 0;
+        height: 100%; /* Asegura que html y body ocupen toda la altura */
         font-family: "Montserrat", sans-serif;
+        background-color: #0a2342; /* Fondo base */
+        color: white; /* Color de texto por defecto */
       }
       .slide {
-        /* width: 1280px;  <-- CONSIDERACIÓN: ¿También quieres ancho completo? */
-        /* min-height: 720px; <-- Elimina o comenta esta línea */
-        height: 100vh; /* <-- Añade esta línea */
+        min-height: 100vh; /* Altura mínima para ocupar pantalla */
+        width: 100%;
         position: relative;
-        overflow: hidden; /* <-- Manten esto si no quieres barras de scroll en el slide */
+        overflow-x: hidden; /* Evita scroll horizontal */
+        /* NO añadir overflow-y: hidden aquí */
         background: linear-gradient(
           135deg,
           #0a2342 0%,
           #1a3c61 50%,
           #0f3156 100%
         );
-        color: white;
-        /* Asegúrate de que body no tenga márgenes que interfieran */
-      }
-
-      /* Asegúrate de que body y html no tengan márgenes/padding por defecto */
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%; /* Puede ayudar en algunos casos, aunque 100vh en el hijo directo suele bastar */
-        font-family: "Montserrat", sans-serif;
-      }
-      /* Tu estilo actual para body ya resetea el margen y padding, lo cual es bueno */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Montserrat", sans-serif;
+        display: flex; /* Usar flex para que el .content pueda usar h-full */
+        flex-direction: column;
       }
 
       .content {
-        position: relative;
-        z-index: 2;
-        padding: 70px 60px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        /* height: 100%; <-- Esto hará que el contenido intente ocupar el 100% de la altura del slide (que ahora es 100vh) */
-        /* Si el contenido es más alto que la pantalla, considera cambiar 'overflow: hidden' en .slide */
-        /* o añadir 'overflow-y: auto;' aquí en .content para permitir scroll interno */
-        height: 100%;
-        box-sizing: border-box; /* Añadir esto es buena práctica con padding y height: 100% */
+        /* Este es el contenedor que tendrá el scroll si el contenido es muy largo */
+        /* Clases de Tailwind aplicadas en el HTML:
+           relative z-10 p-4 md:p-6 lg:p-8 xl:px-16 xl:py-12
+           flex flex-col box-sizing-border-box
+           flex-grow overflow-y-auto <-- CLAVE PARA EL SCROLL */
       }
-      .content {
-        padding: 50px 60px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
+
       .title {
-        font-size: 2.2rem;
+        font-size: 1.8rem; /* Tamaño base móvil */
         font-weight: 600;
-        color: white;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         position: relative;
+        flex-shrink: 0; /* Evita que el título se encoja */
       }
       .title::after {
         content: "";
         position: absolute;
-        bottom: -10px;
+        bottom: -8px;
         left: 0;
-        width: 80px;
-        height: 4px;
+        width: 60px;
+        height: 3px;
         background-color: #4ecdc4;
       }
+      .section-heading {
+        /* Estilo común para encabezados de sección */
+        font-size: 1.1rem; /* Tamaño base móvil */
+        font-weight: 600;
+        margin-bottom: 12px; /* Margen ajustado */
+        display: flex;
+        align-items: center;
+      }
+      .section-icon {
+        /* Contenedor de icono para encabezados */
+        width: 30px; /* Tamaño base móvil */
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(78, 205, 196, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+      .section-icon i {
+        /* Icono dentro del contenedor */
+        color: #4ecdc4;
+        font-size: 0.9rem; /* Tamaño base móvil */
+      }
+
       .chart-container {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
-        padding: 15px;
-        height: 280px;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        padding: 10px; /* Padding base móvil */
+        min-height: 220px; /* Altura mínima base móvil */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        margin-bottom: 24px; /* Espacio después del gráfico */
       }
       .chart-container:hover {
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         background: rgba(255, 255, 255, 0.07);
       }
+      .glow {
+        /* Efecto glow base */
+        box-shadow: 0 0 8px rgba(78, 205, 196, 0.2);
+        animation: glowing 3s infinite alternate;
+      }
+      @keyframes glowing {
+        from {
+          box-shadow: 0 0 8px rgba(78, 205, 196, 0.2);
+        }
+        to {
+          box-shadow: 0 0 15px rgba(78, 205, 196, 0.35);
+        }
+      }
+
       .scenario-card {
         background: rgba(255, 255, 255, 0.07);
-        border-radius: 12px;
-        padding: 14px;
+        border-radius: 10px;
+        padding: 12px; /* Padding base móvil */
         height: 100%;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        border-left-width: 3px;
       }
       .scenario-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         background: rgba(255, 255, 255, 0.1);
       }
       .scenario-card.optimistic {
-        border-left: 4px solid #4ecdc4;
+        border-color: #4ecdc4;
       }
       .scenario-card.conservative {
-        border-left: 4px solid #ffd166;
+        border-color: #ffd166;
       }
       .scenario-card.pessimistic {
-        border-left: 4px solid #ef476f;
+        border-color: #ef476f;
       }
+
       .scenario-icon {
-        width: 42px;
-        height: 42px;
+        /* Icono dentro de la tarjeta de escenario */
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 12px;
+        margin-right: 8px;
         transition: all 0.3s ease;
+        flex-shrink: 0;
       }
       .scenario-card:hover .scenario-icon {
         transform: scale(1.1);
       }
-      .comparison-table {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-      }
-      .comparison-table th {
-        font-weight: 600;
-        text-align: left;
-        padding: 12px 16px;
-        font-size: 0.9rem;
-      }
-      .comparison-table td {
-        padding: 12px 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.2s ease;
-      }
-      .comparison-table tr:hover td {
-        background: rgba(255, 255, 255, 0.05);
-      }
-      .circle-decoration {
-        position: absolute;
-        top: -100px;
-        right: -100px;
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle,
-          rgba(78, 205, 196, 0.1) 0%,
-          rgba(10, 35, 66, 0) 70%
-        );
-        z-index: 0;
-      }
-      .circle-decoration-2 {
-        position: absolute;
-        bottom: -80px;
-        left: -80px;
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle,
-          rgba(78, 205, 196, 0.08) 0%,
-          rgba(10, 35, 66, 0) 70%
-        );
-        z-index: 0;
-      }
+
       .highlight-box {
-        padding: 3px 8px;
+        /* Pequeñas cajas de resaltado */
+        padding: 2px 6px;
         border-radius: 4px;
         font-weight: 600;
         display: inline-block;
-        font-size: 0.85rem;
+        font-size: 0.75rem; /* Tamaño base móvil */
       }
       .highlight-optimistic {
         background-color: rgba(78, 205, 196, 0.2);
@@ -204,53 +183,245 @@
         background-color: rgba(239, 71, 111, 0.2);
         color: #ef476f;
       }
+
       .prediction-card {
+        /* Tarjetas de predicción trimestral */
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        padding: 10px;
+        border-radius: 6px;
+        padding: 8px; /* Padding base móvil */
         text-align: center;
         transition: all 0.3s ease;
+        font-size: 0.8rem; /* Tamaño base móvil */
       }
       .prediction-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-2px);
         background: rgba(255, 255, 255, 0.08);
       }
-      .glow {
-        box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
-        animation: glowing 3s infinite alternate;
+      .prediction-card .font-semibold {
+        font-size: 0.9rem; /* Tamaño específico para números */
       }
-      @keyframes glowing {
-        from {
-          box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
-        }
-        to {
-          box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
-        }
+
+      .table-container {
+        /* Contenedor para tabla responsiva */
+        display: block;
+        width: 100%;
+        overflow-x: auto; /* Scroll horizontal en móvil */
+        -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px; /* Espacio después de la tabla */
       }
-      .transactions-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+      .comparison-table {
+        /* La tabla en sí */
+        width: 100%;
+        min-width: 600px; /* Ancho mínimo para evitar compresión excesiva */
+        border-collapse: collapse; /* Mejor manejo de bordes */
+      }
+      .comparison-table th,
+      .comparison-table td {
+        padding: 10px 12px; /* Padding base móvil */
+        font-size: 0.8rem; /* Fuente base móvil */
+        text-align: left;
+        white-space: nowrap; /* Evitar salto de línea inicial */
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .comparison-table th {
+        font-weight: 600;
+        background-color: rgba(255, 255, 255, 0.08);
+        border-top: none; /* Quitar borde superior del header */
+        white-space: normal; /* Permitir salto de línea en header si es necesario */
+      }
+      .comparison-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.05);
       }
       .factor-icon {
-        width: 24px;
-        height: 24px;
+        /* Iconos pequeños en la tabla */
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin-right: 5px;
-        font-size: 12px;
+        margin-right: 4px;
+        font-size: 10px;
       }
+
       .divider {
-        height: 2px;
+        /* Divisor visual */
+        height: 1px;
         background: linear-gradient(
           to right,
           transparent,
           rgba(255, 255, 255, 0.1),
           transparent
         );
-        margin: 15px 0;
+        margin: 24px 0; /* Margen ajustado */
+      }
+
+      .circle-decoration,
+      .circle-decoration-2 {
+        /* Decoraciones base */
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(78, 205, 196, 0.05) 0%,
+          rgba(10, 35, 66, 0) 70%
+        );
+        z-index: 0;
+        pointer-events: none;
+      }
+      .circle-decoration {
+        top: -80px;
+        right: -60px;
+      }
+      .circle-decoration-2 {
+        bottom: -60px;
+        left: -50px;
+      }
+
+      /* --- Media Queries para pantallas más grandes --- */
+
+      /* Medium screens (tablets, etc.) */
+      @media (min-width: 768px) {
+        .title {
+          font-size: 2rem;
+          margin-bottom: 25px;
+        }
+        .title::after {
+          width: 70px;
+          height: 4px;
+          bottom: -10px;
+        }
+        .section-heading {
+          font-size: 1.2rem;
+          margin-bottom: 16px;
+        }
+        .section-icon {
+          width: 34px;
+          height: 34px;
+          margin-right: 12px;
+        }
+        .section-icon i {
+          font-size: 1rem;
+        }
+        .chart-container {
+          padding: 12px;
+          min-height: 250px;
+          margin-bottom: 32px;
+        }
+        .scenario-card {
+          padding: 14px;
+          border-radius: 12px;
+        }
+        .scenario-icon {
+          width: 40px;
+          height: 40px;
+          margin-right: 10px;
+        }
+        .highlight-box {
+          padding: 3px 8px;
+          font-size: 0.8rem;
+        }
+        .prediction-card {
+          padding: 10px;
+          font-size: 0.85rem;
+        }
+        .prediction-card .font-semibold {
+          font-size: 1rem;
+        }
+        .comparison-table th,
+        .comparison-table td {
+          font-size: 0.85rem;
+          padding: 12px 14px;
+          white-space: normal;
+        } /* Permitir salto de línea en celdas */
+        .factor-icon {
+          width: 22px;
+          height: 22px;
+          font-size: 11px;
+        }
+        .divider {
+          margin: 32px 0;
+        }
+      }
+
+      /* Large screens (desktops) */
+      @media (min-width: 1024px) {
+        .title {
+          font-size: 2.2rem;
+          margin-bottom: 30px;
+        }
+        .title::after {
+          width: 80px;
+        }
+        .section-heading {
+          font-size: 1.3rem;
+          margin-bottom: 20px;
+        }
+        .section-icon {
+          width: 38px;
+          height: 38px;
+        }
+        .section-icon i {
+          font-size: 1.1rem;
+        }
+        .chart-container {
+          padding: 15px;
+          min-height: 280px;
+        }
+        .scenario-card {
+          padding: 16px;
+          border-left-width: 4px;
+        }
+        .scenario-icon {
+          width: 42px;
+          height: 42px;
+          margin-right: 12px;
+        }
+        .highlight-box {
+          font-size: 0.85rem;
+        }
+        .table-container {
+          /* Restaurar comportamiento de tabla normal */
+          display: block; /* Sigue siendo block para que el shadow/radius funcione */
+          overflow-x: visible;
+        }
+        .comparison-table {
+          min-width: auto;
+        } /* Quitar ancho mínimo */
+        .comparison-table th,
+        .comparison-table td {
+          font-size: 0.9rem;
+          padding: 14px 16px;
+        }
+        .factor-icon {
+          width: 24px;
+          height: 24px;
+          font-size: 12px;
+        }
+        .divider {
+          height: 2px;
+          margin: 40px 0;
+        }
+        .circle-decoration {
+          top: -100px;
+          right: -100px;
+          width: 300px;
+          height: 300px;
+        }
+        .circle-decoration-2 {
+          bottom: -80px;
+          left: -80px;
+          width: 250px;
+          height: 250px;
+        }
+        .glow {
+          box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        }
       }
     </style>
   </head>
@@ -258,440 +429,489 @@
     <div class="slide">
       <div class="circle-decoration"></div>
       <div class="circle-decoration-2"></div>
-      <div class="content">
+
+      <!-- Contenedor principal con padding responsivo y scroll vertical -->
+      <!-- Clases clave: flex-grow (para ocupar espacio) y overflow-y-auto (para scroll) -->
+      <div
+        class="content relative z-10 p-4 md:p-6 lg:p-8 xl:px-16 xl:py-12 flex flex-col box-sizing-border-box flex-grow overflow-y-auto"
+      >
+        <!-- 1. Título Principal -->
         <h1 class="title">Expectativas y Proyecciones para 2026</h1>
 
-        <div class="grid grid-cols-12 gap-6 mt-5 z-10">
-          <!-- Left column: Price projections chart -->
-          <div class="col-span-7">
-            <h3 class="text-lg font-semibold mb-3 flex items-center">
-              <div
-                class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
-              >
-                <i class="fas fa-chart-line text-teal-400"></i>
-              </div>
-              Proyección de Precios por m² (€)
-            </h3>
-            <div class="chart-container glow">
-              <canvas id="projectionsChart"></canvas>
-            </div>
-
-            <div class="mt-5">
-              <h3 class="text-lg font-semibold mb-3 flex items-center">
+        <!-- Contenedor del contenido principal que se divide en 2 columnas en LG -->
+        <!-- Este div interno NO necesita flex-grow ni overflow, el scroll lo maneja el padre (.content) -->
+        <div class="mt-4 md:mt-6">
+          <div class="flex flex-col lg:flex-row lg:gap-6 xl:gap-8">
+            <!-- Columna Izquierda (Gráfico y Transacciones) -->
+            <div class="lg:w-7/12 flex-shrink-0">
+              <section>
+                <h2 class="section-heading">
+                  <span class="section-icon"
+                    ><i class="fas fa-chart-line"></i
+                  ></span>
+                  Proyección de Precios por m² (€)
+                </h2>
+                <div class="chart-container glow">
+                  <canvas id="projectionsChart"></canvas>
+                </div>
+              </section>
+              <section>
+                <h2 class="section-heading">
+                  <span class="section-icon"
+                    ><i class="fas fa-exchange-alt"></i
+                  ></span>
+                  Proyección Trimestral Transacciones 2026
+                </h2>
                 <div
-                  class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+                  class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3 mb-4"
                 >
-                  <i class="fas fa-exchange-alt text-teal-400"></i>
-                </div>
-                Proyección Trimestral de Transacciones 2026
-              </h3>
-              <div class="transactions-grid">
-                <div class="prediction-card">
-                  <div class="text-sm text-gray-300 mb-1">T1 2026</div>
-                  <div class="mt-1 flex flex-col">
-                    <span class="text-teal-400 font-semibold">1.350</span>
-                    <span class="text-yellow-400 font-semibold">1.250</span>
-                    <span class="text-red-400 font-semibold">1.150</span>
+                  <!-- Prediction Cards -->
+                  <div class="prediction-card">
+                    <div class="text-xs text-gray-300 mb-1">T1 2026</div>
+                    <div class="mt-1 flex flex-col text-xs">
+                      <span class="text-teal-400 font-semibold">1.350</span>
+                      <span class="text-yellow-400 font-semibold">1.250</span>
+                      <span class="text-red-400 font-semibold">1.150</span>
+                    </div>
+                  </div>
+                  <div class="prediction-card">
+                    <div class="text-xs text-gray-300 mb-1">T2 2026</div>
+                    <div class="mt-1 flex flex-col text-xs">
+                      <span class="text-teal-400 font-semibold">1.480</span>
+                      <span class="text-yellow-400 font-semibold">1.320</span>
+                      <span class="text-red-400 font-semibold">1.180</span>
+                    </div>
+                  </div>
+                  <div class="prediction-card">
+                    <div class="text-xs text-gray-300 mb-1">T3 2026</div>
+                    <div class="mt-1 flex flex-col text-xs">
+                      <span class="text-teal-400 font-semibold">1.520</span>
+                      <span class="text-yellow-400 font-semibold">1.380</span>
+                      <span class="text-red-400 font-semibold">1.200</span>
+                    </div>
+                  </div>
+                  <div class="prediction-card">
+                    <div class="text-xs text-gray-300 mb-1">T4 2026</div>
+                    <div class="mt-1 flex flex-col text-xs">
+                      <span class="text-teal-400 font-semibold">1.590</span>
+                      <span class="text-yellow-400 font-semibold">1.410</span>
+                      <span class="text-red-400 font-semibold">1.190</span>
+                    </div>
                   </div>
                 </div>
-                <div class="prediction-card">
-                  <div class="text-sm text-gray-300 mb-1">T2 2026</div>
-                  <div class="mt-1 flex flex-col">
-                    <span class="text-teal-400 font-semibold">1.480</span>
-                    <span class="text-yellow-400 font-semibold">1.320</span>
-                    <span class="text-red-400 font-semibold">1.180</span>
-                  </div>
+                <!-- Leyenda -->
+                <div
+                  class="text-xs text-center flex flex-wrap justify-center gap-x-3 gap-y-1"
+                >
+                  <span class="flex items-center"
+                    ><span
+                      class="w-2 h-2 inline-block bg-teal-400 rounded-full mr-1"
+                    ></span
+                    >Optimista</span
+                  >
+                  <span class="flex items-center"
+                    ><span
+                      class="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-1"
+                    ></span
+                    >Conservador</span
+                  >
+                  <span class="flex items-center"
+                    ><span
+                      class="w-2 h-2 inline-block bg-red-400 rounded-full mr-1"
+                    ></span
+                    >Pesimista</span
+                  >
                 </div>
-                <div class="prediction-card">
-                  <div class="text-sm text-gray-300 mb-1">T3 2026</div>
-                  <div class="mt-1 flex flex-col">
-                    <span class="text-teal-400 font-semibold">1.520</span>
-                    <span class="text-yellow-400 font-semibold">1.380</span>
-                    <span class="text-red-400 font-semibold">1.200</span>
-                  </div>
-                </div>
-                <div class="prediction-card">
-                  <div class="text-sm text-gray-300 mb-1">T4 2026</div>
-                  <div class="mt-1 flex flex-col">
-                    <span class="text-teal-400 font-semibold">1.590</span>
-                    <span class="text-yellow-400 font-semibold">1.410</span>
-                    <span class="text-red-400 font-semibold">1.190</span>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="mt-2 text-xs text-center flex justify-center space-x-4"
-              >
-                <span class="flex items-center">
-                  <span
-                    class="w-3 h-3 inline-block bg-teal-400 rounded-full mr-1"
+              </section>
+            </div>
+
+            <!-- Columna Derecha (Escenarios) -->
+            <div class="lg:w-5/12 mt-6 lg:mt-0">
+              <section>
+                <h2 class="section-heading">
+                  <span class="section-icon"
+                    ><i class="fas fa-lightbulb"></i
                   ></span>
-                  Optimista
-                </span>
-                <span class="flex items-center">
-                  <span
-                    class="w-3 h-3 inline-block bg-yellow-400 rounded-full mr-1"
-                  ></span>
-                  Conservador
-                </span>
-                <span class="flex items-center">
-                  <span
-                    class="w-3 h-3 inline-block bg-red-400 rounded-full mr-1"
-                  ></span>
-                  Pesimista
-                </span>
-              </div>
+                  Escenarios para 2026
+                </h2>
+                <div class="space-y-3 md:space-y-4">
+                  <!-- Scenario Cards -->
+                  <div class="scenario-card optimistic">
+                    <div class="flex items-center mb-2">
+                      <div class="scenario-icon bg-teal-400 bg-opacity-20">
+                        <i
+                          class="fas fa-arrow-trend-up text-teal-400 text-sm md:text-base"
+                        ></i>
+                      </div>
+                      <h3
+                        class="text-base md:text-lg font-semibold text-teal-400"
+                      >
+                        Escenario Optimista
+                      </h3>
+                    </div>
+                    <div class="pl-2 space-y-1">
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Crecimiento precios:</span>
+                        <span class="highlight-box highlight-optimistic"
+                          >+8.5% anual</span
+                        >
+                      </div>
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Precio Dic 2026:</span>
+                        <span class="highlight-box highlight-optimistic"
+                          >3.100 €/m²</span
+                        >
+                      </div>
+                      <ul class="text-xs text-gray-300 space-y-1 mt-1.5">
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-teal-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Aumento turismo y teletrabajo</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-teal-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Nuevos proyectos urbanos</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-teal-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Inversión extranjera (+30%)</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="scenario-card conservative">
+                    <div class="flex items-center mb-2">
+                      <div class="scenario-icon bg-yellow-400 bg-opacity-20">
+                        <i
+                          class="fas fa-equals text-yellow-400 text-sm md:text-base"
+                        ></i>
+                      </div>
+                      <h3
+                        class="text-base md:text-lg font-semibold text-yellow-400"
+                      >
+                        Escenario Conservador
+                      </h3>
+                    </div>
+                    <div class="pl-2 space-y-1">
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Crecimiento precios:</span>
+                        <span class="highlight-box highlight-conservative"
+                          >+4% anual</span
+                        >
+                      </div>
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Precio Dic 2026:</span>
+                        <span class="highlight-box highlight-conservative"
+                          >2.830 €/m²</span
+                        >
+                      </div>
+                      <ul class="text-xs text-gray-300 space-y-1 mt-1.5">
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-yellow-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Estabilización mercado</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-yellow-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Demanda extranjera moderada (25%)</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-check text-yellow-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Regulación viv. turísticas</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="scenario-card pessimistic">
+                    <div class="flex items-center mb-2">
+                      <div class="scenario-icon bg-red-400 bg-opacity-20">
+                        <i
+                          class="fas fa-arrow-trend-down text-red-400 text-sm md:text-base"
+                        ></i>
+                      </div>
+                      <h3
+                        class="text-base md:text-lg font-semibold text-red-400"
+                      >
+                        Escenario Pesimista
+                      </h3>
+                    </div>
+                    <div class="pl-2 space-y-1">
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Crecimiento precios:</span>
+                        <span class="highlight-box highlight-pessimistic"
+                          >+1.5% anual</span
+                        >
+                      </div>
+                      <div
+                        class="flex flex-wrap justify-between items-center text-xs md:text-sm gap-x-2"
+                      >
+                        <span>Precio Dic 2026:</span>
+                        <span class="highlight-box highlight-pessimistic"
+                          >2.670 €/m²</span
+                        >
+                      </div>
+                      <ul class="text-xs text-gray-300 space-y-1 mt-1.5">
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Desaceleración económica</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Restricciones inversión</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i
+                            class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5 flex-shrink-0"
+                          ></i
+                          ><span>Tipos de interés > 5%</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
 
-          <!-- Right column: Scenarios description -->
-          <div class="col-span-5">
-            <h3 class="text-lg font-semibold mb-3 flex items-center">
-              <div
-                class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
-              >
-                <i class="fas fa-lightbulb text-teal-400"></i>
-              </div>
-              Escenarios para 2026
-            </h3>
+          <!-- Divisor -->
+          <div class="divider"></div>
 
-            <div class="space-y-3">
-              <!-- Optimistic scenario -->
-              <div class="scenario-card optimistic">
-                <div class="flex items-center mb-2">
-                  <div class="scenario-icon bg-teal-400 bg-opacity-20">
-                    <i class="fas fa-arrow-trend-up text-teal-400"></i>
-                  </div>
-                  <h4 class="text-lg font-semibold text-teal-400">
-                    Escenario Optimista
-                  </h4>
-                </div>
-                <div class="pl-2">
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Crecimiento de precios:</span>
-                    <span class="highlight-box highlight-optimistic"
-                      >+8.5% anual</span
-                    >
-                  </div>
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Precio diciembre 2026:</span>
-                    <span class="highlight-box highlight-optimistic"
-                      >3.100 €/m²</span
-                    >
-                  </div>
-                  <ul class="text-xs text-gray-300 space-y-1 mt-2">
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-teal-400 mt-0.5 mr-1.5"></i>
-                      <span
-                        >Aumento sostenido del turismo y teletrabajadores</span
-                      >
-                    </li>
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-teal-400 mt-0.5 mr-1.5"></i>
-                      <span
-                        >Nuevos proyectos de infraestructura y desarrollo
-                        urbano</span
-                      >
-                    </li>
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-teal-400 mt-0.5 mr-1.5"></i>
-                      <span>Mayor atracción de inversión extranjera (30%)</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Conservative scenario -->
-              <div class="scenario-card conservative">
-                <div class="flex items-center mb-2">
-                  <div class="scenario-icon bg-yellow-400 bg-opacity-20">
-                    <i class="fas fa-equals text-yellow-400"></i>
-                  </div>
-                  <h4 class="text-lg font-semibold text-yellow-400">
-                    Escenario Conservador
-                  </h4>
-                </div>
-                <div class="pl-2">
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Crecimiento de precios:</span>
-                    <span class="highlight-box highlight-conservative"
-                      >+4% anual</span
-                    >
-                  </div>
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Precio diciembre 2026:</span>
-                    <span class="highlight-box highlight-conservative"
-                      >2.830 €/m²</span
-                    >
-                  </div>
-                  <ul class="text-xs text-gray-300 space-y-1 mt-2">
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-yellow-400 mt-0.5 mr-1.5"></i>
-                      <span>Estabilización del mercado post-pandemia</span>
-                    </li>
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-yellow-400 mt-0.5 mr-1.5"></i>
-                      <span>Moderación en la demanda extranjera (25%)</span>
-                    </li>
-                    <li class="flex items-start">
-                      <i class="fas fa-check text-yellow-400 mt-0.5 mr-1.5"></i>
-                      <span
-                        >Impacto de regulaciones sobre viviendas
-                        turísticas</span
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Pessimistic scenario -->
-              <div class="scenario-card pessimistic">
-                <div class="flex items-center mb-2">
-                  <div class="scenario-icon bg-red-400 bg-opacity-20">
-                    <i class="fas fa-arrow-trend-down text-red-400"></i>
-                  </div>
-                  <h4 class="text-lg font-semibold text-red-400">
-                    Escenario Pesimista
-                  </h4>
-                </div>
-                <div class="pl-2">
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Crecimiento de precios:</span>
-                    <span class="highlight-box highlight-pessimistic"
-                      >+1.5% anual</span
-                    >
-                  </div>
-                  <div class="flex justify-between text-sm mb-1">
-                    <span>Precio diciembre 2026:</span>
-                    <span class="highlight-box highlight-pessimistic"
-                      >2.670 €/m²</span
-                    >
-                  </div>
-                  <ul class="text-xs text-gray-300 space-y-1 mt-2">
-                    <li class="flex items-start">
-                      <i
-                        class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5"
-                      ></i>
-                      <span>Desaceleración económica global o europea</span>
-                    </li>
-                    <li class="flex items-start">
-                      <i
-                        class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5"
-                      ></i>
-                      <span
-                        >Restricciones severas a la inversión extranjera</span
-                      >
-                    </li>
-                    <li class="flex items-start">
-                      <i
-                        class="fas fa-exclamation text-red-400 mt-0.5 mr-1.5"
-                      ></i>
-                      <span>Aumento de tipos de interés por encima del 5%</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <!-- Tabla Comparativa de Factores -->
+          <section>
+            <h2 class="section-heading">
+              <span class="section-icon"><i class="fas fa-cogs"></i></span>
+              Factores de Influencia para 2026
+            </h2>
+            <div class="table-container">
+              <table class="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>
+                      <div class="flex items-center">
+                        <div class="factor-icon bg-teal-400 bg-opacity-20">
+                          <i class="fas fa-arrow-up text-teal-400"></i>
+                        </div>
+                        <span class="text-teal-400">Optimista</span>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="flex items-center">
+                        <div class="factor-icon bg-yellow-400 bg-opacity-20">
+                          <i class="fas fa-equals text-yellow-400"></i>
+                        </div>
+                        <span class="text-yellow-400">Conservador</span>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="flex items-center">
+                        <div class="factor-icon bg-red-400 bg-opacity-20">
+                          <i class="fas fa-arrow-down text-red-400"></i>
+                        </div>
+                        <span class="text-red-400">Pesimista</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-medium">Política gob.</td>
+                    <td>Incentivos construcción</td>
+                    <td>Continuidad</td>
+                    <td>Restricciones</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Turismo</td>
+                    <td>+10%</td>
+                    <td>+4%</td>
+                    <td>-5%</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Tipos interés</td>
+                    <td>Bajan (3.2%)</td>
+                    <td>Estables (4%)</td>
+                    <td>Suben (5.5%)</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Oferta nueva</td>
+                    <td>+800 ud/año</td>
+                    <td>+500 ud/año</td>
+                    <td>+300 ud/año</td>
+                  </tr>
+                  <tr>
+                    <td class="font-medium">Inv. extranjera</td>
+                    <td>+30%</td>
+                    <td>=25%</td>
+                    <td>-18%</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </div>
+          </section>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Comparative table of factors -->
-        <div class="mt-3 flex-grow">
-          <h3 class="text-lg font-semibold mb-3 flex items-center">
+        <!-- Footer y Paginación -->
+        <!-- flex-shrink: 0 evita que el footer se encoja si el contenido es muy largo -->
+        <footer class="pt-4 md:pt-6 flex-shrink-0">
+          <div
+            class="text-xs md:text-sm text-gray-400 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left mb-4"
+          >
+            <div class="mb-2 sm:mb-0">
+              <i class="fas fa-info-circle mr-1"></i> Proyecciones basadas en
+              análisis macroeconómico y tendencias.
+            </div>
+            <div class="hidden sm:block">
+              Análisis Sector Inmobiliario LPGC | 8
+            </div>
+          </div>
+          <nav aria-label="Paginación">
             <div
-              class="w-8 h-8 rounded-full bg-teal-400 bg-opacity-20 flex items-center justify-center mr-2"
+              class="pt-4 border-t border-gray-600 flex flex-col sm:flex-row justify-between items-stretch sm:items-center text-sm gap-3"
             >
-              <i class="fas fa-cogs text-teal-400"></i>
+              <a
+                href="page_7.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                <i class="fas fa-chevron-left mr-2" aria-hidden="true"></i>
+                Anterior
+              </a>
+              <span
+                class="text-gray-300 font-medium text-center order-first sm:order-none"
+                aria-current="page"
+                >Página 8 de 9</span
+              >
+              <a
+                href="page_9.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                Siguiente
+                <i class="fas fa-chevron-right ml-2" aria-hidden="true"></i>
+              </a>
             </div>
-            Factores de Influencia para 2026
-          </h3>
-
-          <div class="comparison-table">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-white bg-opacity-10">
-                  <th class="w-1/5">Factor</th>
-                  <th class="w-1/5">
-                    <div class="flex items-center">
-                      <div class="factor-icon bg-teal-400 bg-opacity-20">
-                        <i class="fas fa-arrow-up text-teal-400"></i>
-                      </div>
-                      <span class="text-teal-400">Optimista</span>
-                    </div>
-                  </th>
-                  <th class="w-1/5">
-                    <div class="flex items-center">
-                      <div class="factor-icon bg-yellow-400 bg-opacity-20">
-                        <i class="fas fa-equals text-yellow-400"></i>
-                      </div>
-                      <span class="text-yellow-400">Conservador</span>
-                    </div>
-                  </th>
-                  <th class="w-1/5">
-                    <div class="flex items-center">
-                      <div class="factor-icon bg-red-400 bg-opacity-20">
-                        <i class="fas fa-arrow-down text-red-400"></i>
-                      </div>
-                      <span class="text-red-400">Pesimista</span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="font-medium">Política gubernamental</td>
-                  <td>Incentivos a la construcción</td>
-                  <td>Continuidad de políticas actuales</td>
-                  <td>Regulaciones restrictivas</td>
-                </tr>
-                <tr>
-                  <td class="font-medium">Turismo</td>
-                  <td>Crecimiento sostenido +10%</td>
-                  <td>Estabilización +4%</td>
-                  <td>Reducción -5%</td>
-                </tr>
-                <tr>
-                  <td class="font-medium">Tipos de interés</td>
-                  <td>Reducción a 3.2%</td>
-                  <td>Estables en 4%</td>
-                  <td>Subida a 5.5%</td>
-                </tr>
-                <tr>
-                  <td class="font-medium">Oferta de vivienda nueva</td>
-                  <td>+800 unidades/año</td>
-                  <td>+500 unidades/año</td>
-                  <td>+300 unidades/año</td>
-                </tr>
-                <tr>
-                  <td class="font-medium">Inversión extranjera</td>
-                  <td>Aumento al 30%</td>
-                  <td>Estable en 25%</td>
-                  <td>Reducción al 18%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div
-          class="mt-auto text-sm text-gray-400 pt-3 flex items-center justify-between"
-        >
-          <div>
-            <i class="fas fa-info-circle mr-1"></i> Proyecciones basadas en
-            tendencias históricas y análisis de factores macroeconómicos
-          </div>
-          <div>
-            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 8
-          </div>
-        </div>
-        <!-- ****** INICIO PAGINACIÓN ****** -->
-        <div
-          class="mt-12 pt-6 border-t border-gray-600 flex justify-between items-center text-sm"
-        >
-          <!-- Botón Anterior -->
-          <a
-            href="page_7.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-          >
-            <i class="fas fa-chevron-left mr-2"></i> Anterior
-          </a>
-
-          <!-- Indicador de Página -->
-          <span class="text-gray-300 font-medium">Página 8 de 9</span>
-
-          <!-- Botón Siguiente -->
-          <a
-            href="page_9.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-          >
-            Siguiente <i class="fas fa-chevron-right ml-2"></i>
-          </a>
-        </div>
-        <!-- ****** FIN PAGINACIÓN ****** -->
+          </nav>
+        </footer>
       </div>
+      <!-- Fin div.content -->
     </div>
+    <!-- Fin div.slide -->
 
     <script>
+      // El script de Chart.js permanece igual
       document.addEventListener("DOMContentLoaded", function () {
         const ctx = document
           .getElementById("projectionsChart")
-          .getContext("2d");
+          ?.getContext("2d");
 
-        // Create gradients for each scenario
-        const optimisticGradient = ctx.createLinearGradient(0, 0, 0, 250);
+        if (!ctx) {
+          console.error(
+            "No se pudo obtener el contexto del canvas 'projectionsChart'"
+          );
+          return;
+        }
+
+        const chartHeight =
+          ctx.canvas.clientHeight > 0 ? ctx.canvas.clientHeight : 280; // Fallback height
+        const optimisticGradient = ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          chartHeight
+        );
         optimisticGradient.addColorStop(0, "rgba(78, 205, 196, 0.3)");
         optimisticGradient.addColorStop(1, "rgba(78, 205, 196, 0.0)");
-
-        const conservativeGradient = ctx.createLinearGradient(0, 0, 0, 250);
+        const conservativeGradient = ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          chartHeight
+        );
         conservativeGradient.addColorStop(0, "rgba(255, 209, 102, 0.3)");
         conservativeGradient.addColorStop(1, "rgba(255, 209, 102, 0.0)");
-
-        const pessimisticGradient = ctx.createLinearGradient(0, 0, 0, 250);
+        const pessimisticGradient = ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          chartHeight
+        );
         pessimisticGradient.addColorStop(0, "rgba(239, 71, 111, 0.3)");
         pessimisticGradient.addColorStop(1, "rgba(239, 71, 111, 0.0)");
 
         const projectionsChart = new Chart(ctx, {
           type: "line",
           data: {
-            labels: [
-              "Abr 25",
-              "Jul 25",
-              "Oct 25",
-              "Ene 26",
-              "Abr 26",
-              "Jul 26",
-              "Oct 26",
-              "Dic 26",
-            ],
+            labels: ["A25", "J25", "O25", "E26", "A26", "J26", "O26", "D26"],
             datasets: [
               {
-                label: "Escenario Optimista",
+                label: "Optimista",
                 data: [2580, 2650, 2720, 2800, 2870, 2950, 3020, 3100],
                 borderColor: "#4ECDC4",
                 backgroundColor: optimisticGradient,
-                borderWidth: 3,
+                borderWidth: 2,
                 tension: 0.4,
                 fill: true,
-                pointRadius: 4,
-                pointHoverRadius: 7,
+                pointRadius: 2,
+                pointHoverRadius: 5,
                 pointBackgroundColor: "#4ECDC4",
                 pointBorderColor: "white",
-                pointBorderWidth: 2,
+                pointBorderWidth: 1,
               },
               {
-                label: "Escenario Conservador",
+                label: "Conservador",
                 data: [2580, 2610, 2650, 2680, 2720, 2760, 2790, 2830],
                 borderColor: "#FFD166",
                 backgroundColor: conservativeGradient,
-                borderWidth: 3,
+                borderWidth: 2,
                 tension: 0.4,
                 fill: true,
-                pointRadius: 4,
-                pointHoverRadius: 7,
+                pointRadius: 2,
+                pointHoverRadius: 5,
                 pointBackgroundColor: "#FFD166",
                 pointBorderColor: "white",
-                pointBorderWidth: 2,
+                pointBorderWidth: 1,
               },
               {
-                label: "Escenario Pesimista",
+                label: "Pesimista",
                 data: [2580, 2590, 2605, 2620, 2635, 2650, 2660, 2670],
                 borderColor: "#EF476F",
                 backgroundColor: pessimisticGradient,
-                borderWidth: 3,
+                borderWidth: 2,
                 tension: 0.4,
                 fill: true,
-                pointRadius: 4,
-                pointHoverRadius: 7,
+                pointRadius: 2,
+                pointHoverRadius: 5,
                 pointBackgroundColor: "#EF476F",
                 pointBorderColor: "white",
-                pointBorderWidth: 2,
+                pointBorderWidth: 1,
               },
             ],
           },
           options: {
             maintainAspectRatio: false,
+            responsive: true,
             interaction: {
               mode: "index",
               intersect: false,
@@ -702,27 +922,21 @@
                 align: "center",
                 labels: {
                   color: "#ffffff",
-                  padding: 15,
+                  padding: 10,
                   usePointStyle: true,
                   pointStyle: "circle",
-                  font: {
-                    family: "Montserrat",
-                    size: 11,
-                  },
+                  boxWidth: 8,
+                  font: { family: "Montserrat", size: 10 },
                 },
               },
               tooltip: {
-                backgroundColor: "rgba(10, 35, 66, 0.85)",
-                titleFont: {
-                  family: "Montserrat",
-                  size: 12,
-                },
-                bodyFont: {
-                  family: "Montserrat",
-                  size: 12,
-                },
-                padding: 10,
-                cornerRadius: 6,
+                backgroundColor: "rgba(10, 35, 66, 0.9)",
+                titleFont: { family: "Montserrat", size: 11 },
+                bodyFont: { family: "Montserrat", size: 11 },
+                padding: 8,
+                cornerRadius: 4,
+                displayColors: true,
+                boxPadding: 3,
                 callbacks: {
                   label: function (context) {
                     return (
@@ -731,57 +945,43 @@
                   },
                 },
               },
+              title: { display: false },
             },
             scales: {
               y: {
-                beginAtZero: false,
-                min: 2500,
-                grid: {
-                  color: "rgba(255, 255, 255, 0.1)",
-                },
+                grid: { color: "rgba(255, 255, 255, 0.08)" },
                 ticks: {
                   color: "#A7A9AC",
-                  font: {
-                    size: 10,
-                    family: "Montserrat",
-                  },
+                  font: { size: 9, family: "Montserrat" },
                   callback: function (value) {
-                    return value + " €";
+                    return value + "€";
                   },
+                  maxTicksLimit: 5,
                 },
               },
               x: {
-                grid: {
-                  color: "rgba(255, 255, 255, 0.1)",
-                },
+                grid: { color: "rgba(255, 255, 255, 0.08)" },
                 ticks: {
                   color: "#A7A9AC",
-                  font: {
-                    size: 10,
-                    family: "Montserrat",
-                  },
+                  font: { size: 9, family: "Montserrat" },
                 },
               },
             },
             animations: {
-              tension: {
-                duration: 1000,
-                easing: "linear",
-              },
+              tension: { duration: 1000, easing: "linear" },
+            },
+            layout: {
+              padding: { top: 5, bottom: 0, left: 0, right: 5 },
             },
           },
         });
 
-        // Add hover effects to scenario cards
-        // Add hover effects to scenario cards
         const cards = document.querySelectorAll(".scenario-card");
         cards.forEach((card) => {
           card.addEventListener("mouseenter", () => {
-            // Ejemplo: Añadir una clase adicional para un efecto más pronunciado
             card.classList.add("hover-active");
           });
           card.addEventListener("mouseleave", () => {
-            // Eliminar la clase cuando el cursor sale
             card.classList.remove("hover-active");
           });
         });

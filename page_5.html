@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análisis por Zonas - Inmobiliario LPGC</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -17,12 +18,15 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+      /* Estilos base (Mobile First) */
       body,
       html {
         margin: 0;
         padding: 0;
         font-family: "Montserrat", sans-serif;
         height: 100%;
+        background-color: #0a2342; /* Fondo base por si acaso */
+        color: white;
       }
       .slide {
         min-height: 100vh;
@@ -32,22 +36,55 @@
           #1a3c61 50%,
           #0f3156 100%
         );
-        color: white;
         position: relative;
+        overflow-x: hidden; /* Evitar scroll horizontal */
+        display: flex; /* Para que el contenedor interno pueda usar flex-1 */
       }
+      .content-wrapper {
+        /* Contenedor principal dentro de .slide */
+        /* Clases Tailwind: mx-auto flex flex-col w-full min-h-screen */
+        /* Padding responsivo aplicado directamente en el HTML */
+      }
+
+      .title {
+        /* Estilo del título principal */
+        font-size: 1.8rem; /* Base móvil */
+        font-weight: 600;
+        margin-bottom: 1rem; /* Base móvil (equivale a mb-4) */
+        position: relative;
+        flex-shrink: 0; /* Evita que el título se encoja */
+      }
+      .title::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: #4ecdc4;
+      }
+
       .circle-decoration {
         position: absolute;
         bottom: -50px;
         right: -50px;
-        width: 250px;
-        height: 250px;
+        width: 200px; /* Base móvil */
+        height: 200px;
         border-radius: 50%;
         background: radial-gradient(
           circle,
-          rgba(78, 205, 196, 0.1) 0%,
-          rgba(10, 35, 66, 0) 70%
+          rgba(78, 205, 196, 0.08) 0%,
+          /* Más sutil */ rgba(10, 35, 66, 0) 70%
         );
         z-index: 0;
+        pointer-events: none;
+      }
+      .map-container {
+        /* Contenedor del mapa */
+        position: relative;
+        margin-bottom: 0.5rem; /* mb-2 */
+        height: 40vh; /* Altura base móvil */
+        min-height: 280px; /* Altura mínima base móvil */
       }
       .island-shape {
         position: absolute;
@@ -75,8 +112,8 @@
       .district {
         position: absolute;
         background-color: rgba(78, 205, 196, 0.2);
-        border: 2px solid rgba(78, 205, 196, 0.6);
-        border-radius: 100%;
+        border: 1px solid rgba(78, 205, 196, 0.5); /* Borde más fino */
+        border-radius: 50%; /* Hacerlos circulares */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -84,34 +121,43 @@
         font-weight: 500;
         transition: all 0.3s ease;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        animation: pulse 3s infinite;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
+        animation: pulse 3s infinite alternate; /* Cambiado a alternate */
+        z-index: 2; /* Asegurar que estén por encima de las formas */
+        /* Tamaños base móvil (aplicados en línea, pero podrían ir aquí) */
+        width: 15vw;
+        height: 15vw;
+        min-width: 50px;
+        min-height: 50px;
+        max-width: 70px;
+        max-height: 70px;
       }
       @keyframes pulse {
-        0% {
+        from {
+          transform: scale(1);
           box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
         }
-        70% {
-          box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
-        }
-        100% {
-          box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+        to {
+          transform: scale(1.03);
+          box-shadow: 0 0 0 8px rgba(78, 205, 196, 0);
         }
       }
       .district-info {
-        background: rgba(10, 35, 66, 0.8);
-        padding: 8px 10px;
-        border-radius: 8px;
+        background: rgba(10, 35, 66, 0.85); /* Más opaco */
+        padding: 4px 6px; /* Más pequeño */
+        border-radius: 6px;
         transition: all 0.2s ease;
-        max-width: 100%;
+        max-width: 90%; /* Evitar que se salga del círculo */
+        font-size: 0.65rem; /* Fuente más pequeña */
       }
       .price-label {
-        font-size: 0.9rem;
+        font-size: 0.75rem; /* Más pequeño */
         font-weight: 700;
         color: white;
+        margin-top: 2px;
       }
       .variation {
-        font-size: 0.75rem;
+        font-size: 0.6rem; /* Más pequeño */
         font-weight: 600;
       }
       .positive {
@@ -120,17 +166,128 @@
       .negative {
         color: #ff6b6b;
       }
-      /* Mejorar el uso del espacio para los distritos */
-      @media (min-width: 1280px) {
+
+      .chart-wrapper {
+        /* Contenedor para el gráfico */
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+        padding: 0.75rem; /* p-3 */
+        margin-bottom: 0.5rem; /* mb-2 */
+        height: 200px; /* Altura base móvil */
+      }
+      .demand-container {
+        /* Contenedor tabla demanda */
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+        overflow: hidden; /* Para que el header redondeado funcione */
+      }
+      .highlights-container {
+        /* Contenedor destacados */
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+        padding: 0.75rem; /* p-3 */
+      }
+      .highlight-item {
+        /* Elemento destacado */
+        margin-bottom: 1rem; /* mb-4 */
+        font-size: 0.8rem; /* Base móvil */
+      }
+      .highlight-icon {
+        /* Icono destacado */
+        width: 1.75rem; /* w-7 */
+        height: 1.75rem; /* h-7 */
+        margin-right: 0.5rem; /* mr-2 */
+        flex-shrink: 0;
+      }
+
+      /* --- Media Queries --- */
+
+      /* Medium screens (tablets) */
+      @media (min-width: 768px) {
+        .title {
+          font-size: 2rem;
+          margin-bottom: 1.5rem;
+        } /* md:text-3xl mb-6 */
+        .title::after {
+          width: 70px;
+          height: 4px;
+          bottom: -10px;
+        }
         .map-container {
-          height: 48vh !important;
-          min-height: 340px !important;
+          height: 45vh;
+          min-height: 320px;
         }
         .district {
+          width: 10vw;
+          height: 10vw;
+          min-width: 60px;
+          min-height: 60px;
+          max-width: 90px;
+          max-height: 90px;
+          border-width: 2px;
+        }
+        .district-info {
+          padding: 6px 8px;
+          font-size: 0.7rem;
+        }
+        .price-label {
+          font-size: 0.8rem;
+        }
+        .variation {
+          font-size: 0.65rem;
+        }
+        .chart-wrapper {
+          height: 230px;
+        }
+        .highlight-item {
+          font-size: 0.875rem;
+        } /* text-sm */
+      }
+
+      /* Large screens (desktops) */
+      @media (min-width: 1024px) {
+        .title {
+          font-size: 2.2rem;
+          margin-bottom: 2rem;
+        }
+        .map-container {
+          height: 50vh;
+          min-height: 350px;
+        }
+        .chart-wrapper {
+          height: 260px;
+        }
+      }
+
+      /* Extra Large screens */
+      @media (min-width: 1280px) {
+        .map-container {
+          height: 55vh !important;
+          min-height: 400px !important;
+        }
+        .district {
+          width: 7vw !important;
+          height: 7vw !important;
           min-width: 70px !important;
           min-height: 70px !important;
-          max-width: 9vw !important;
-          max-height: 9vw !important;
+          max-width: 110px !important;
+          max-height: 110px !important;
+        }
+        .district-info {
+          padding: 8px 10px;
+          font-size: 0.75rem;
+        }
+        .price-label {
+          font-size: 0.9rem;
+        }
+        .variation {
+          font-size: 0.7rem;
         }
       }
     </style>
@@ -138,393 +295,381 @@
   <body>
     <div class="slide">
       <div class="circle-decoration"></div>
+      <!-- Contenedor principal que ocupa toda la altura y permite scroll interno si es necesario -->
+      <!-- Eliminado max-w-7xl. Padding responsivo añadido aquí -->
       <div
-        class="max-w-7xl mx-auto px-2 sm:px-4 py-4 min-h-screen flex flex-col"
+        class="content-wrapper mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 py-4 flex flex-col w-full min-h-screen"
       >
-        <h1 class="text-2xl md:text-3xl font-bold mb-4 title">
-          Análisis por Zonas
-        </h1>
+        <!-- Título -->
+        <h1 class="title">Análisis por Zonas</h1>
+
         <!-- GRID PRINCIPAL -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 flex-1 h-full">
-          <!-- MAPA Y LEYENDA -->
-          <div class="xl:col-span-7 flex flex-col h-full">
-            <h3
-              class="text-base md:text-lg font-semibold mb-3 flex items-center"
-            >
-              <i class="fas fa-map-marked-alt text-teal-400 mr-2"></i>
-              Precios por Distritos (€/m²) y Variación Anual
-            </h3>
-            <div
-              class="map-container relative mb-2"
-              style="height: 42vh; min-height: 320px"
-            >
-              <div class="absolute inset-0 p-2 sm:p-4">
-                <div class="island-shape"></div>
-                <div class="coastal-line"></div>
-                <!-- DISTRITOS -->
-                <div
-                  class="district"
-                  style="
-                    width: 7vw;
-                    height: 7vw;
-                    left: 45%;
-                    top: 20%;
-                    min-width: 60px;
-                    min-height: 60px;
-                    max-width: 90px;
-                    max-height: 90px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Vegueta</div>
-                    <div class="price-label">3.150 €/m²</div>
-                    <div class="variation positive">+14.8%</div>
+        <!-- flex-1 hace que este grid ocupe el espacio restante verticalmente -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8 flex-1">
+          <!-- Columna Izquierda: MAPA Y DESTACADOS -->
+          <!-- flex flex-col para que sus hijos (mapa y destacados) se apilen -->
+          <div class="xl:col-span-7 flex flex-col">
+            <!-- Sección Mapa -->
+            <section class="flex flex-col">
+              <!-- flex-col para que el título y el mapa se apilen -->
+              <h3
+                class="text-base md:text-lg font-semibold mb-3 flex items-center flex-shrink-0"
+              >
+                <i class="fas fa-map-marked-alt text-teal-400 mr-2"></i>
+                Precios por Distritos (€/m²) y Variación Anual
+              </h3>
+              <!-- Contenedor del mapa (altura definida en CSS) -->
+              <div class="map-container flex-grow">
+                <!-- flex-grow para que ocupe espacio si es posible -->
+                <div class="absolute inset-0 p-2 sm:p-4">
+                  <div class="island-shape"></div>
+                  <div class="coastal-line"></div>
+                  <!-- DISTRITOS (Posiciones ajustadas ligeramente para mejor distribución) -->
+                  <div class="district" style="left: 48%; top: 18%">
+                    <div class="district-info">
+                      <div class="font-semibold">Vegueta</div>
+                      <div class="price-label">3.150 €/m²</div>
+                      <div class="variation positive">+14.8%</div>
+                    </div>
+                  </div>
+                  <div class="district" style="left: 65%; top: 28%">
+                    <div class="district-info">
+                      <div class="font-semibold">Puerto-Canteras</div>
+                      <div class="price-label">3.240 €/m²</div>
+                      <div class="variation positive">+15.2%</div>
+                    </div>
+                  </div>
+                  <div class="district" style="left: 32%; top: 32%">
+                    <div class="district-info">
+                      <div class="font-semibold">Ciudad Alta</div>
+                      <div class="price-label">2.280 €/m²</div>
+                      <div class="variation positive">+10.5%</div>
+                    </div>
+                  </div>
+                  <div class="district" style="left: 15%; top: 58%">
+                    <div class="district-info">
+                      <div class="font-semibold">Tamaraceite</div>
+                      <div class="price-label">1.980 €/m²</div>
+                      <div class="variation positive">+8.2%</div>
+                    </div>
+                  </div>
+                  <div class="district" style="left: 58%; top: 62%">
+                    <div class="district-info">
+                      <div class="font-semibold">Guanarteme</div>
+                      <div class="price-label">2.950 €/m²</div>
+                      <div class="variation positive">+13.6%</div>
+                    </div>
+                  </div>
+                  <div class="district" style="left: 75%; top: 45%">
+                    <div class="district-info">
+                      <div class="font-semibold">Mesa y López</div>
+                      <div class="price-label">3.050 €/m²</div>
+                      <div class="variation positive">+14.3%</div>
+                    </div>
+                  </div>
+                  <div
+                    class="district bg-teal-400 bg-opacity-30 border-teal-500"
+                    style="
+                      left: 42%;
+                      top: 45%;
+                      width: 18vw;
+                      height: 18vw;
+                      min-width: 65px;
+                      min-height: 65px;
+                      max-width: 95px;
+                      max-height: 95px;
+                    "
+                  >
+                    <!-- Hecho un poco más grande -->
+                    <div class="district-info">
+                      <div class="font-bold">Centro</div>
+                      <div class="price-label">3.320 €/m²</div>
+                      <div class="variation positive">+16.7%</div>
+                      <i class="fas fa-star text-yellow-400 text-xs mt-1"></i>
+                    </div>
+                  </div>
+                  <!-- Ocean indicator -->
+                  <div
+                    class="absolute"
+                    style="right: 10px; top: 10px; text-align: right"
+                  >
+                    <i class="fas fa-water text-blue-300 text-lg"></i>
+                    <span class="text-xs text-blue-300 ml-1"
+                      >Océano Atlántico</span
+                    >
+                  </div>
+                  <div class="absolute" style="left: 10px; top: 10px">
+                    <i class="fas fa-compass text-gray-400 text-lg"></i>
                   </div>
                 </div>
-                <div
-                  class="district"
-                  style="
-                    width: 7.5vw;
-                    height: 7.5vw;
-                    left: 62%;
-                    top: 30%;
-                    min-width: 65px;
-                    min-height: 65px;
-                    max-width: 100px;
-                    max-height: 100px;
-                  "
+              </div>
+              <!-- Leyenda -->
+              <div
+                class="mt-2 bg-white bg-opacity-5 p-2 rounded-md text-xs text-center flex-shrink-0"
+              >
+                <span class="mr-2 md:mr-3"
+                  ><i class="fas fa-circle text-teal-400 mr-1"></i> Alto
+                  interés</span
                 >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Puerto-Canteras</div>
-                    <div class="price-label">3.240 €/m²</div>
-                    <div class="variation positive">+15.2%</div>
+                <span class="mr-2 md:mr-3"
+                  ><i class="fas fa-star text-yellow-400 mr-1"></i> Mayor
+                  revalorización</span
+                >
+                <span
+                  ><i class="fas fa-chart-line text-blue-300 mr-1"></i>
+                  Emergentes</span
+                >
+              </div>
+            </section>
+
+            <!-- Sección Destacados -->
+            <!-- mt-4 o mt-6 para separar del mapa -->
+            <section class="mt-4 md:mt-6 flex flex-col flex-shrink-0">
+              <h3
+                class="text-base md:text-lg font-semibold mb-3 flex items-center"
+              >
+                <i class="fas fa-info-circle text-teal-400 mr-2"></i>
+                Aspectos Destacados
+              </h3>
+              <div class="highlights-container">
+                <!-- Contenedor con estilos base -->
+                <div class="highlight-item flex items-start">
+                  <div
+                    class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full flex items-center justify-center"
+                  >
+                    <i class="fas fa-arrow-trend-up text-teal-400"></i>
                   </div>
-                </div>
-                <div
-                  class="district"
-                  style="
-                    width: 6vw;
-                    height: 6vw;
-                    left: 30%;
-                    top: 35%;
-                    min-width: 55px;
-                    min-height: 55px;
-                    max-width: 80px;
-                    max-height: 80px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Ciudad Alta</div>
-                    <div class="price-label">2.280 €/m²</div>
-                    <div class="variation positive">+10.5%</div>
-                  </div>
-                </div>
-                <div
-                  class="district"
-                  style="
-                    width: 5vw;
-                    height: 5vw;
-                    left: 18%;
-                    top: 60%;
-                    min-width: 50px;
-                    min-height: 50px;
-                    max-width: 70px;
-                    max-height: 70px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Tamaraceite</div>
-                    <div class="price-label">1.980 €/m²</div>
-                    <div class="variation positive">+8.2%</div>
-                  </div>
-                </div>
-                <div
-                  class="district"
-                  style="
-                    width: 6vw;
-                    height: 6vw;
-                    left: 55%;
-                    top: 65%;
-                    min-width: 55px;
-                    min-height: 55px;
-                    max-width: 80px;
-                    max-height: 80px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Guanarteme</div>
-                    <div class="price-label">2.950 €/m²</div>
-                    <div class="variation positive">+13.6%</div>
-                  </div>
-                </div>
-                <div
-                  class="district"
-                  style="
-                    width: 6vw;
-                    height: 6vw;
-                    left: 72%;
-                    top: 48%;
-                    min-width: 55px;
-                    min-height: 55px;
-                    max-width: 80px;
-                    max-height: 80px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-semibold">Mesa y López</div>
-                    <div class="price-label">3.050 €/m²</div>
-                    <div class="variation positive">+14.3%</div>
-                  </div>
-                </div>
-                <div
-                  class="district bg-teal-400 bg-opacity-30 border-teal-500"
-                  style="
-                    width: 8vw;
-                    height: 8vw;
-                    left: 40%;
-                    top: 48%;
-                    min-width: 70px;
-                    min-height: 70px;
-                    max-width: 110px;
-                    max-height: 110px;
-                  "
-                >
-                  <div class="district-info">
-                    <div class="text-xs font-bold">Centro</div>
-                    <div class="price-label">3.320 €/m²</div>
-                    <div class="variation positive">+16.7%</div>
-                    <i class="fas fa-star text-yellow-400 text-xs mt-1"></i>
-                  </div>
-                </div>
-                <!-- Ocean indicator -->
-                <div
-                  class="absolute"
-                  style="right: 10px; top: 10px; text-align: right"
-                >
-                  <i class="fas fa-water text-blue-300 text-lg"></i>
-                  <span class="text-xs text-blue-300 ml-1"
-                    >Océano Atlántico</span
+                  <span
+                    >El distrito
+                    <span class="font-semibold text-teal-300">Centro</span>
+                    registra la mayor revalorización (+16.7%) por su atractivo
+                    comercial y de ocio.</span
                   >
                 </div>
-                <div class="absolute" style="left: 10px; top: 10px">
-                  <i class="fas fa-compass text-gray-400 text-lg"></i>
+                <div class="highlight-item flex items-start">
+                  <div
+                    class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full flex items-center justify-center"
+                  >
+                    <i class="fas fa-users text-teal-400"></i>
+                  </div>
+                  <span
+                    >Las zonas costeras (<span
+                      class="font-semibold text-teal-300"
+                      >Puerto-Canteras</span
+                    >) atraen un 35% de compradores extranjeros.</span
+                  >
+                </div>
+                <div class="highlight-item flex items-start">
+                  <div
+                    class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full flex items-center justify-center"
+                  >
+                    <i class="fas fa-building text-teal-400"></i>
+                  </div>
+                  <span
+                    ><span class="font-semibold text-teal-300"
+                      >Tamaraceite</span
+                    >
+                    presenta potencial de crecimiento por nuevos desarrollos y
+                    precios más asequibles.</span
+                  >
                 </div>
               </div>
-            </div>
-            <div
-              class="mt-2 bg-white bg-opacity-5 p-2 rounded-md text-xs text-center"
-            >
-              <span class="mr-3"
-                ><i class="fas fa-circle text-teal-400 mr-1"></i> Zona con alto
-                interés inversor</span
-              >
-              <span class="mr-3"
-                ><i class="fas fa-star text-yellow-400 mr-1"></i> Mayor
-                revalorización</span
-              >
-              <span
-                ><i class="fas fa-chart-line text-blue-300 mr-1"></i> Zonas
-                emergentes</span
-              >
-            </div>
-            <div class="xl:col-span-7 flex flex-col mt-14">
-              <div class="flex-1 flex flex-col">
-                <h3
-                  class="text-base md:text-lg font-semibold mb-4 flex items-center"
-                >
-                  <i class="fas fa-info-circle text-teal-400 mr-2"></i>
-                  Aspectos Destacados
-                </h3>
-                <div
-                  class="bg-white bg-opacity-5 rounded-xl shadow-xl highlights-container p-3 flex-1"
-                >
-                  <div class="highlight-item flex items-start mt-4 mb-12">
-                    <div
-                      class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full w-7 h-7 flex items-center justify-center mr-2"
-                    >
-                      <i class="fas fa-arrow-trend-up text-teal-400"></i>
-                    </div>
-                    <span
-                      >El distrito Centro registra la mayor revalorización
-                      (16.7%) debido a su atractivo comercial y de ocio</span
-                    >
-                  </div>
-                  <div class="highlight-item flex items-start mb-12">
-                    <div
-                      class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full w-7 h-7 flex items-center justify-center mr-2"
-                    >
-                      <i class="fas fa-users text-teal-400"></i>
-                    </div>
-                    <span
-                      >Las zonas costeras atraen un 35% de compradores
-                      extranjeros, principalmente en Puerto-Canteras</span
-                    >
-                  </div>
-                  <div class="highlight-item flex items-start mb-10">
-                    <div
-                      class="highlight-icon bg-teal-400 bg-opacity-20 rounded-full w-7 h-7 flex items-center justify-center mr-2"
-                    >
-                      <i class="fas fa-building text-teal-400"></i>
-                    </div>
-                    <span
-                      >Tamaraceite presenta el mayor potencial de crecimiento
-                      por nuevos desarrollos urbanos y precios asequibles</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
+            </section>
           </div>
-          <!-- PANEL DERECHO -->
-          <div class="xl:col-span-5 flex flex-col gap-4 h-full">
-            <div class="flex-1 flex flex-col">
+          <!-- Fin Columna Izquierda -->
+
+          <!-- Columna Derecha: GRÁFICO Y TABLA DEMANDA -->
+          <!-- flex flex-col para que gráfico y tabla se apilen y ocupen espacio -->
+          <div class="xl:col-span-5 flex flex-col gap-4 md:gap-6">
+            <!-- Sección Gráfico -->
+            <section class="flex flex-col">
+              <!-- flex-col para título y gráfico -->
               <h3
-                class="text-base md:text-lg font-semibold mb-2 flex items-center"
+                class="text-base md:text-lg font-semibold mb-2 flex items-center flex-shrink-0"
               >
                 <i class="fas fa-chart-bar text-teal-400 mr-2"></i>
-                Comparativa de Precios
+                Comparativa de Precios (€/m²)
               </h3>
-              <div
-                class="bg-white bg-opacity-5 rounded-xl shadow-xl p-3 mb-2 flex-1"
-                style="height: 260px"
-              >
+              <!-- Wrapper del gráfico con altura definida en CSS -->
+              <div class="chart-wrapper flex-grow">
+                <!-- flex-grow para ocupar espacio vertical -->
                 <canvas id="districtsChart"></canvas>
               </div>
-            </div>
-            <div class="flex-1 flex flex-col">
+            </section>
+
+            <!-- Sección Tabla Demanda -->
+            <section class="flex flex-col">
+              <!-- flex-col para título y tabla -->
               <h3
-                class="text-base md:text-lg font-semibold mb-2 flex items-center"
+                class="text-base md:text-lg font-semibold mb-2 flex items-center flex-shrink-0"
               >
                 <i class="fas fa-fire-alt text-teal-400 mr-2"></i>
-                Zonas Más Demandadas
+                Zonas Más Demandadas (Top 4)
               </h3>
-              <div
-                class="bg-white bg-opacity-5 rounded-xl shadow-xl demand-container flex-1"
-              >
+              <!-- Contenedor de la tabla -->
+              <div class="demand-container flex-grow">
+                <!-- flex-grow para ocupar espacio -->
+                <!-- Header Tabla -->
                 <div
-                  class="grid grid-cols-4 text-xs font-medium bg-teal-400 bg-opacity-10 px-4 py-2 rounded-t-md"
+                  class="grid grid-cols-4 text-xs font-medium bg-teal-400 bg-opacity-10 px-3 sm:px-4 py-2"
                 >
-                  <div>Ranking</div>
+                  <div>#</div>
                   <div>Zona</div>
-                  <div>Precio medio</div>
-                  <div>Perfil comprador</div>
+                  <div class="text-right sm:text-left">Precio</div>
+                  <!-- Alineación ajustada -->
+                  <div class="hidden sm:block">Perfil</div>
+                  <!-- Oculto en móvil muy pequeño -->
                 </div>
-                <div>
-                  <!-- FILA 1 -->
+                <!-- Filas Tabla -->
+                <div class="text-xs sm:text-sm">
+                  <!-- Tamaño de fuente base para filas -->
                   <div
-                    class="grid grid-cols-4 items-center px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition mt-16"
+                    class="grid grid-cols-4 items-center px-3 sm:px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition"
                   >
-                    <div class="flex justify-center">
+                    <div class="flex justify-center sm:justify-start">
                       <span
-                        class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-base text-teal-300"
+                        class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-sm sm:text-base text-teal-300"
                         >1</span
                       >
                     </div>
-                    <div class="font-medium text-sm">Centro</div>
-                    <div class="text-teal-400 text-sm">3.320 €/m²</div>
-                    <div class="text-xs text-gray-300">Inversor</div>
+                    <div class="font-medium">Centro</div>
+                    <div class="text-teal-400 text-right sm:text-left">
+                      3.320€
+                    </div>
+                    <!-- Abreviado -->
+                    <div class="text-gray-300 hidden sm:block">Inversor</div>
                   </div>
-                  <!-- FILA 2 -->
                   <div
-                    class="grid grid-cols-4 items-center px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition mt-16"
+                    class="grid grid-cols-4 items-center px-3 sm:px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition"
                   >
-                    <div class="flex justify-center">
+                    <div class="flex justify-center sm:justify-start">
                       <span
-                        class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-base text-teal-300"
+                        class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-sm sm:text-base text-teal-300"
                         >2</span
                       >
                     </div>
-                    <div class="font-medium text-xs">Puerto-Canteras</div>
-                    <div class="text-teal-400 text-sm">3.240 €/m²</div>
-                    <div class="text-xs text-gray-300">Turístico</div>
+                    <div class="font-medium">Pto-Cant.</div>
+                    <!-- Abreviado -->
+                    <div class="text-teal-400 text-right sm:text-left">
+                      3.240€
+                    </div>
+                    <div class="text-gray-300 hidden sm:block">Turístico</div>
                   </div>
-                  <!-- FILA 3 -->
                   <div
-                    class="grid grid-cols-4 items-center px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition mt-16"
+                    class="grid grid-cols-4 items-center px-3 sm:px-4 py-2 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 transition"
                   >
-                    <div class="flex justify-center">
+                    <div class="flex justify-center sm:justify-start">
                       <span
-                        class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-base text-teal-300"
+                        class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-sm sm:text-base text-teal-300"
                         >3</span
                       >
                     </div>
-                    <div class="font-medium text-sm">Vegueta</div>
-                    <div class="text-teal-400 text-sm">3.150 €/m²</div>
-                    <div class="text-xs text-gray-300">Cultural</div>
+                    <div class="font-medium">Vegueta</div>
+                    <div class="text-teal-400 text-right sm:text-left">
+                      3.150€
+                    </div>
+                    <div class="text-gray-300 hidden sm:block">Cultural</div>
                   </div>
-                  <!-- FILA 4 -->
                   <div
-                    class="grid grid-cols-4 items-center px-4 py-2 hover:bg-white hover:bg-opacity-5 transition mt-16 mb-4"
+                    class="grid grid-cols-4 items-center px-3 sm:px-4 py-2 hover:bg-white hover:bg-opacity-5 transition"
                   >
-                    <div class="flex justify-center">
+                    <div class="flex justify-center sm:justify-start">
                       <span
-                        class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-base text-teal-300"
+                        class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-500 bg-opacity-20 font-bold text-sm sm:text-base text-teal-300"
                         >4</span
                       >
                     </div>
-                    <div class="font-medium text-sm">Guanarteme</div>
-                    <div class="text-teal-400 text-sm">2.950 €/m²</div>
-                    <div class="text-xs text-gray-300">Residencial</div>
+                    <div class="font-medium">Guanarteme</div>
+                    <div class="text-teal-400 text-right sm:text-left">
+                      2.950€
+                    </div>
+                    <div class="text-gray-300 hidden sm:block">Residencial</div>
                   </div>
                 </div>
               </div>
+            </section>
+          </div>
+          <!-- Fin Columna Derecha -->
+        </div>
+        <!-- Fin Grid Principal -->
+
+        <!-- Footer y Paginación -->
+        <!-- mt-auto empuja esto hacia abajo dentro del contenedor flex principal -->
+        <footer class="mt-auto pt-4 flex-shrink-0">
+          <div
+            class="text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2 mb-2"
+          >
+            <div>
+              <i class="fas fa-info-circle mr-1"></i> Fuente: Idealista, Datos
+              transacciones Abr 2024 - Abr 2025
             </div>
+            <div>Análisis Sector Inmobiliario LPGC | 5</div>
           </div>
-        </div>
-        <!-- FOOTER -->
-        <div
-          class="mt-4 text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2"
-        >
-          <div>
-            <i class="fas fa-info-circle mr-1"></i> Fuente: Idealista, Datos de
-            transacciones Abril 2024 - Abril 2025
-          </div>
-          <div>
-            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 5
-          </div>
-        </div>
-        <!-- PAGINACIÓN -->
-        <div
-          class="mt-2 pt-2 border-t border-gray-600 flex flex-col sm:flex-row justify-between items-center text-sm gap-3"
-        >
-          <a
-            href="page_4.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-          >
-            <i class="fas fa-chevron-left mr-2"></i> Anterior
-          </a>
-          <span class="text-gray-300 font-medium">Página 5 de 9</span>
-          <a
-            href="page_6.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-          >
-            Siguiente <i class="fas fa-chevron-right ml-2"></i>
-          </a>
-        </div>
+          <!-- Paginación -->
+          <nav aria-label="Paginación">
+            <div
+              class="pt-2 border-t border-gray-600 flex flex-col sm:flex-row justify-between items-stretch sm:items-center text-sm gap-3"
+            >
+              <a
+                href="page_4.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                <i class="fas fa-chevron-left mr-2" aria-hidden="true"></i>
+                Anterior
+              </a>
+              <span
+                class="text-gray-300 font-medium text-center order-first sm:order-none"
+                aria-current="page"
+                >Página 5 de 9</span
+              >
+              <a
+                href="page_6.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                Siguiente
+                <i class="fas fa-chevron-right ml-2" aria-hidden="true"></i>
+              </a>
+            </div>
+          </nav>
+        </footer>
       </div>
+      <!-- Fin content-wrapper -->
     </div>
+    <!-- Fin slide -->
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Districts comparison chart
         const districtCtx = document
           .getElementById("districtsChart")
-          .getContext("2d");
-        const gradient = districtCtx.createLinearGradient(0, 0, 400, 0);
+          ?.getContext("2d");
+
+        if (!districtCtx) {
+          console.error("Canvas 'districtsChart' not found");
+          return;
+        }
+
+        // Ajustar gradiente a la altura real del canvas
+        const chartHeight =
+          districtCtx.canvas.clientHeight > 0
+            ? districtCtx.canvas.clientHeight
+            : 260;
+        const gradient = districtCtx.createLinearGradient(0, 0, 0, chartHeight); // Cambiado a gradiente vertical
         gradient.addColorStop(0, "rgba(78, 205, 196, 0.8)");
-        gradient.addColorStop(1, "rgba(78, 205, 196, 0.4)");
+        gradient.addColorStop(1, "rgba(78, 205, 196, 0.3)"); // Más suave al final
 
         new Chart(districtCtx, {
           type: "bar",
           data: {
             labels: [
               "Centro",
-              "Puerto-Canteras",
+              "Pto-Cant.",
               "Vegueta",
-              "Mesa y López",
-              "Guanarteme",
-              "Ciudad Alta",
-              "Tamaraceite",
-            ],
+              "M. López",
+              "Guanart.",
+              "C. Alta",
+              "Tamarac.",
+            ], // Abreviados
             datasets: [
               {
                 label: "Precio medio (€/m²)",
@@ -533,20 +678,22 @@
                 borderColor: "rgba(78, 205, 196, 1)",
                 borderWidth: 1,
                 borderRadius: 4,
-                barThickness: 16,
+                barPercentage: 0.7, // Ajustar ancho de barras
+                categoryPercentage: 0.8, // Ajustar espacio entre barras
               },
             ],
           },
           options: {
-            indexAxis: "y",
+            indexAxis: "y", // Mantener barras horizontales
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
               legend: { display: false },
               tooltip: {
                 backgroundColor: "rgba(10, 35, 66, 0.9)",
-                titleFont: { family: "Montserrat", size: 12 },
-                bodyFont: { family: "Montserrat", size: 12 },
+                titleFont: { family: "Montserrat", size: 11 }, // Ajustado
+                bodyFont: { family: "Montserrat", size: 11 }, // Ajustado
+                padding: 8, // Ajustado
                 callbacks: {
                   label: function (context) {
                     return context.raw + " €/m²";
@@ -560,31 +707,37 @@
                 grid: { color: "rgba(255, 255, 255, 0.1)" },
                 ticks: {
                   callback: function (value) {
-                    return value + " €";
-                  },
+                    return value / 1000 + "k €";
+                  }, // Más corto
                   color: "#A7A9AC",
-                  font: { size: 10 },
+                  font: { size: 9 }, // Más pequeño
+                  maxTicksLimit: 5, // Menos ticks
                 },
               },
               y: {
                 grid: { display: false },
-                ticks: { color: "#ffffff", font: { size: 10 } },
+                ticks: {
+                  color: "#ffffff",
+                  font: { size: 9 }, // Más pequeño
+                },
               },
             },
           },
         });
 
-        // Add hover effects to districts
+        // Add hover effects to districts (sin cambios)
         const districts = document.querySelectorAll(".district");
         districts.forEach((district) => {
           district.addEventListener("mouseover", function () {
             districts.forEach((d) => {
               if (d !== district) d.style.opacity = "0.5";
             });
+            district.style.zIndex = "3"; // Traer al frente al hacer hover
           });
           district.addEventListener("mouseout", function () {
             districts.forEach((d) => {
               d.style.opacity = "1";
+              d.style.zIndex = "2"; // Restaurar z-index
             });
           });
         });
