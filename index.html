@@ -41,27 +41,27 @@
         font-family: "Montserrat", sans-serif;
       }
       .pagination-background-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px; /* Ajusta esta altura según necesites para cubrir la paginación */
-            background: linear-gradient(to top,
-                rgba(0, 0, 0, 0.85) 0%, /* Más oscuro abajo */
-                rgba(0, 0, 0, 0.7) 50%, /* Un poco menos oscuro a media altura de la banda */
-                rgba(0, 0, 0, 0) 100%  /* Transparente arriba para difuminar */
-            );
-            z-index: 1; /* Debe estar por encima de .background-image y .overlay general */
-                        /* pero por debajo de .content (que tiene z-index 2) */
-            pointer-events: none; /* Importante: Para que no bloquee clics en los botones */
-        }
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.85) 0%,
+          rgba(0, 0, 0, 0.7) 50%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
       .content {
         position: relative;
         z-index: 2;
-        padding: 70px 60px;
+        padding: 20px 16px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Empuja header arriba y lo demás abajo */
+        justify-content: space-between;
         height: 100%;
         box-sizing: border-box;
       }
@@ -78,52 +78,52 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 65%;
+        width: 100%;
         height: 100%;
-        /* He cambiado la URL a una que funciona desde Wikimedia Commons, la de Unsplash original a veces da problemas de hotlinking */
         background-image: url("https://images.pexels.com/photos/22080094/pexels-photo-22080094/free-photo-of-blanco-y-negro-carretera-trafico-edificios.jpeg");
         background-size: cover;
         background-position: center;
         opacity: 0.85;
-        clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        clip-path: none;
       }
       .header {
-        margin-bottom: 40px; /* Ajusta si es necesario */
+        margin-bottom: 20px;
       }
       .title {
-        font-size: 3rem;
+        font-size: 1.8rem;
         font-weight: 700;
         line-height: 1.15;
-        margin-bottom: 30px;
-        max-width: 700px;
+        margin-bottom: 15px;
+        max-width: 100%;
         letter-spacing: -0.5px;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       .decorative-line {
-        width: 140px;
-        height: 4px;
+        width: 100px;
+        height: 3px;
         background: linear-gradient(to right, #4ecdc4, #56e8e0);
-        margin: 30px 0;
+        margin: 15px 0;
         box-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
       }
       .subtitle {
-        font-size: 1.6rem;
+        font-size: 1.1rem;
         font-weight: 300;
         color: #4ecdc4;
         line-height: 1.4;
-        max-width: 600px;
-        margin-bottom: 30px;
+        max-width: 100%;
+        margin-bottom: 15px;
       }
       .features {
         display: flex;
-        gap: 30px;
-        margin-top: 40px;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
       }
       .feature {
         display: flex;
         align-items: center;
         background-color: rgba(255, 255, 255, 0.07);
-        padding: 12px 20px;
+        padding: 10px 15px;
         border-radius: 8px;
         transition: all 0.3s ease;
       }
@@ -132,40 +132,39 @@
         transform: translateY(-2px);
       }
       .feature-icon {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: rgba(78, 205, 196, 0.15);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        margin-right: 10px;
       }
       .date-container {
         display: flex;
         align-items: center;
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         font-weight: 500;
         color: #a7a9ac;
-        /* padding-top: 20px; <-- Eliminado para que se agrupe mejor con paginación */
         letter-spacing: 1px;
       }
       .date-icon {
-        width: 36px;
-        height: 36px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 12px;
+        margin-right: 10px;
       }
       .circle-decoration {
         position: absolute;
-        bottom: -100px;
-        left: -100px;
-        width: 300px;
-        height: 300px;
+        bottom: -50px;
+        left: -50px;
+        width: 150px;
+        height: 150px;
         border-radius: 50%;
         background: radial-gradient(
           circle,
@@ -174,22 +173,82 @@
         );
         z-index: 0;
       }
-      /* Estilos específicos para la paginación si son necesarios */
       .pagination-container {
-        margin-top: auto; /* Empuja este bloque hacia abajo si hay espacio */
-        padding-top: 20px; /* Espacio sobre la fecha/paginación */
+        margin-top: auto;
+        padding-top: 15px;
       }
       .pagination-controls {
-        margin-top: 20px; /* Espacio entre fecha y paginación */
-        padding-top: 1.5rem; /* pt-6 */
-        border-top: 1px solid #4a5568; /* border-gray-600 */
+        margin-top: 15px;
+        padding-top: 1rem;
+        border-top: 1px solid #4a5568;
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: center;
-        font-size: 0.875rem; /* text-sm */
+        gap: 10px;
+        font-size: 0.8rem;
       }
       .oculto {
         display: none;
+      }
+
+      /* Media Queries para pantallas más grandes (Mobile-First) */
+      @media only screen and (min-width: 768px) {
+        .content {
+          padding: 70px 60px;
+        }
+        .background-image {
+          width: 65%;
+          clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        .title {
+          font-size: 3rem;
+          margin-bottom: 30px;
+          max-width: 700px;
+        }
+        .decorative-line {
+          width: 140px;
+          height: 4px;
+          margin: 30px 0;
+        }
+        .subtitle {
+          font-size: 1.6rem;
+          margin-bottom: 30px;
+          max-width: 600px;
+        }
+        .features {
+          flex-direction: row;
+          gap: 30px;
+          margin-top: 40px;
+        }
+        .feature {
+          padding: 12px 20px;
+        }
+        .feature-icon {
+          width: 40px;
+          height: 40px;
+          margin-right: 15px;
+        }
+        .date-container {
+          font-size: 1.2rem;
+        }
+        .date-icon {
+          width: 36px;
+          height: 36px;
+          margin-right: 12px;
+        }
+        .circle-decoration {
+          bottom: -100px;
+          left: -100px;
+          width: 300px;
+          height: 300px;
+        }
+        .pagination-controls {
+          flex-direction: row;
+          justify-content: space-between;
+          margin-top: 20px;
+          padding-top: 1.5rem;
+          font-size: 0.875rem;
+        }
       }
     </style>
   </head>
@@ -198,9 +257,7 @@
       <div class="background-image"></div>
       <div class="overlay"></div>
       <div class="circle-decoration"></div>
-
       <div class="content">
-        <!-- Bloque Superior (Header) -->
         <div class="header">
           <h1 class="title">
             Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria
@@ -210,7 +267,6 @@
             Tendencias y Perspectivas (Abril 2024 - Abril 2025 + Expectativas
             para 2026)
           </h2>
-
           <div class="features">
             <div class="feature">
               <div class="feature-icon">
@@ -218,14 +274,12 @@
               </div>
               <span>Evolución del mercado</span>
             </div>
-
             <div class="feature">
               <div class="feature-icon">
                 <i class="fas fa-building text-teal-400 text-lg"></i>
               </div>
               <span>Oportunidades de inversión</span>
             </div>
-
             <div class="feature">
               <div class="feature-icon">
                 <i class="fas fa-map-marked-alt text-teal-400 text-lg"></i>
@@ -234,9 +288,6 @@
             </div>
           </div>
         </div>
-        <!-- Fin del .header -->
-
-        <!-- Bloque Inferior (Fecha y Paginación) -->
         <div class="pagination-container">
           <div class="date-container">
             <div class="date-icon">
@@ -244,20 +295,13 @@
             </div>
             Abril 2025
           </div>
-
-          <!-- ****** INICIO PAGINACIÓN ****** -->
           <div class="pagination-controls">
-            <!-- Botón Anterior (Deshabilitado en la página 1) -->
             <span
               class="px-4 py-2 rounded bg-gray-700 text-gray-500 cursor-not-allowed opacity-60 oculto"
             >
               <i class="fas fa-chevron-left mr-2"></i> Anterior
             </span>
-
-            <!-- Indicador de Página -->
             <span class="text-gray-300 font-medium">Página 1 de 9</span>
-
-            <!-- Botón Siguiente -->
             <a
               href="page_2.html"
               class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
@@ -265,20 +309,9 @@
               Siguiente <i class="fas fa-chevron-right ml-2"></i>
             </a>
           </div>
-          <!-- ****** FIN PAGINACIÓN ****** -->
         </div>
-        <!-- Fin del .pagination-container -->
       </div>
-      <!-- Cierre de .content -->
-        <!-- BANDA OSCURA PARA PAGINACIÓN -->
-        <div class="pagination-background-overlay"></div>
-
-    </div> <!-- Cierre de .slide -->
-</body>
-</html>
+      <div class="pagination-background-overlay"></div>
     </div>
-    <!-- Cierre de .slide -->
-
-    <!-- NO DEBE HABER NADA ENTRE EL CIERRE DE .SLIDE Y EL CIERRE DE BODY -->
   </body>
 </html>
