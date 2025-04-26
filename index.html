@@ -180,16 +180,29 @@
         margin-top: auto;
         padding-top: 15px;
       }
+
+      /* --- Estilos de paginación modificados --- */
       .pagination-controls {
         margin-top: 15px;
-        padding-top: 1rem;
-        border-top: 1px solid #4a5568;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        padding-top: 1rem; /* Mantenemos padding superior */
+        border-top: 1px solid #4a5568; /* Mantenemos borde superior */
+        display: flex; /* Siempre flex */
+        flex-direction: row; /* Siempre en fila */
+        justify-content: space-between; /* Separa el botón Anterior del grupo Siguiente */
+        align-items: center; /* Alinea verticalmente los elementos */
+      }
+
+      /* Aseguramos tamaño de fuente base para móvil */
+      .pagination-controls span,
+      .pagination-controls a {
+        font-size: 0.8rem; /* Tamaño base para móvil */
+      }
+      .pagination-controls .text-gray-300 {
+        /* Asegurar que el indicador también tenga tamaño base */
         font-size: 0.8rem;
       }
+      /* --- Fin de estilos de paginación modificados --- */
+
       .oculto {
         display: none;
       }
@@ -254,13 +267,26 @@
           width: 300px;
           height: 300px;
         }
+
+        /* --- Ajustes de paginación para escritorio --- */
         .pagination-controls {
-          flex-direction: row;
-          justify-content: space-between;
           margin-top: 20px;
           padding-top: 1.5rem;
+        }
+
+        /* Ajustar tamaño de fuente de los controles específicos si es necesario */
+        .pagination-controls span,
+        .pagination-controls a {
+          font-size: 0.875rem; /* Ejemplo de ajuste de fuente para escritorio */
+        }
+        .pagination-controls .text-gray-300 {
+          /* Asegurar que el indicador también cambie */
           font-size: 0.875rem;
         }
+        .oculto {
+          display: hidden;
+        }
+        /* --- Fin de ajustes de paginación para escritorio --- */
       }
     </style>
   </head>
@@ -308,20 +334,33 @@
             </div>
             Abril 2025
           </div>
+          <!-- Controles de paginación -->
           <div class="pagination-controls">
+            <!-- Botón Anterior (Visible pero deshabilitado en la primera página) -->
             <span
               class="px-4 py-2 rounded bg-gray-700 text-gray-500 cursor-not-allowed opacity-60 oculto"
+              id="prev-button"
             >
               <i class="fas fa-chevron-left mr-2"></i> Anterior
             </span>
-            <span class="text-gray-300 font-medium">Página 1 de 9</span>
-            <a
-              href="page_2.html"
-              class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-            >
-              Siguiente <i class="fas fa-chevron-right ml-2"></i>
-            </a>
+
+            <!-- Nuevo DIV para agrupar indicador y botón Siguiente -->
+            <div class="flex items-center space-x-3 md:space-x-4">
+              <!-- Clases Tailwind para flex y espaciado -->
+              <span class="text-gray-300 font-medium" id="page-indicator">
+                Página 1 de 9
+              </span>
+              <a
+                href="page_2.html"
+                class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+                id="next-button"
+              >
+                Siguiente <i class="fas fa-chevron-right ml-2"></i>
+              </a>
+            </div>
+            <!-- Fin del nuevo DIV -->
           </div>
+          <!-- Fin Controles de paginación -->
         </div>
       </div>
       <div class="pagination-background-overlay"></div>
