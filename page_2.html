@@ -327,31 +327,45 @@
           </div>
         </div>
 
-        <div class="info-footer">
-          <div>
-            <i class="fas fa-info-circle mr-1"></i> Fuentes: Idealista,
-            Tecnocasa, Consejo General del Notariado, ISTAC 2024-2025
-          </div>
-          <div>
-            Análisis del Sector Inmobiliario en Las Palmas de Gran Canaria | 2
-          </div>
-        </div>
-
-        <div class="pagination-footer">
-          <a
-            href="index.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+        <!-- Footer y Paginación -->
+        <!-- mt-auto empuja esto hacia abajo dentro del contenedor flex principal -->
+        <footer class="mt-auto pt-4 flex-shrink-0">
+          <div
+            class="text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2 mb-2"
           >
-            <i class="fas fa-chevron-left mr-2"></i> Anterior
-          </a>
-          <span class="text-gray-300 font-medium">Página 2 de 9</span>
-          <a
-            href="page_3.html"
-            class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-          >
-            Siguiente <i class="fas fa-chevron-right ml-2"></i>
-          </a>
-        </div>
+            <div>
+              <i class="fas fa-info-circle mr-1"></i> Fuentes: Idealista, ISTAC,
+              Consejo General del Notariado, Ayuntamiento de Las Palmas de GC
+            </div>
+            <div>Análisis Sector Inmobiliario LPGC | 2</div>
+          </div>
+          <!-- Paginación -->
+          <nav aria-label="Paginación">
+            <div
+              class="pt-2 border-t border-gray-600 flex flex-col sm:flex-row justify-between items-stretch sm:items-center text-sm gap-3"
+            >
+              <a
+                href="index.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                <i class="fas fa-chevron-left mr-2" aria-hidden="true"></i>
+                Anterior
+              </a>
+              <span
+                class="text-gray-300 font-medium text-center order-first sm:order-none"
+                aria-current="page"
+                >Página 2 de 9</span
+              >
+              <a
+                href="page_3.html"
+                class="text-center px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
+              >
+                Siguiente
+                <i class="fas fa-chevron-right ml-2" aria-hidden="true"></i>
+              </a>
+            </div>
+          </nav>
+        </footer>
       </div>
     </div>
 

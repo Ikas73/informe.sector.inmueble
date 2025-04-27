@@ -335,30 +335,19 @@
             Abril 2025
           </div>
           <!-- Controles de paginación -->
-          <div class="pagination-controls">
-            <!-- Botón Anterior (Visible pero deshabilitado en la primera página) -->
-            <span
-              class="px-4 py-2 rounded bg-gray-700 text-gray-500 cursor-not-allowed opacity-60 oculto"
-              id="prev-button"
-            >
-              <i class="fas fa-chevron-left mr-2"></i> Anterior
+          <div class="pagination-controls justify-between">
+            <!-- Indicador de página centrado -->
+            <span class="text-gray-300 font-medium ml-auto" id="page-indicator">
+              Página 1 de 9
             </span>
-
-            <!-- Nuevo DIV para agrupar indicador y botón Siguiente -->
-            <div class="flex items-center space-x-3 md:space-x-4">
-              <!-- Clases Tailwind para flex y espaciado -->
-              <span class="text-gray-300 font-medium" id="page-indicator">
-                Página 1 de 9
-              </span>
-              <a
-                href="page_2.html"
-                class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md"
-                id="next-button"
-              >
-                Siguiente <i class="fas fa-chevron-right ml-2"></i>
-              </a>
-            </div>
-            <!-- Fin del nuevo DIV -->
+            <!-- Botón Siguiente alineado a la derecha -->
+            <a
+              href="page_2.html"
+              class="px-4 py-2 rounded bg-teal-600 hover:bg-teal-500 text-white transition duration-200 ease-in-out transform hover:-translate-y-px shadow-md ml-auto"
+              id="next-button"
+            >
+              Siguiente <i class="fas fa-chevron-right ml-2"></i>
+            </a>
           </div>
           <!-- Fin Controles de paginación -->
         </div>
