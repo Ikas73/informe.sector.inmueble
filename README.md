@@ -10,9 +10,7 @@ Este repositorio contiene un informe estático sobre el sector inmobiliario en L
 
 Si has desplegado el proyecto usando GitHub Pages, puedes añadir el enlace aquí:
 
-**[Ver Demo en Vivo](TU_URL_DE_GITHUB_PAGES)**
-
-_(Reemplaza `TU_URL_DE_GITHUB_PAGES` con el enlace real una vez desplegado)._
+**[Ver Demo en Vivo](https://ikas73.github.io/informe.sector.inmueble/)**
 
 ---
 
