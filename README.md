@@ -6,11 +6,10 @@ Este repositorio contiene un informe estático sobre el sector inmobiliario en L
 
 ---
 
-## 🚀 Demo en Vivo (Opcional)
+## 🚀 Demo en Vivo
 
-Si has desplegado el proyecto usando GitHub Pages, puedes añadir el enlace aquí:
-
-**[Ver Demo en Vivo](https://ikas73.github.io/informe.sector.inmueble/)**
+- Puedes ver el informe en vivo en el siguiente enlace:
+- **[Informe Inmobiliario - Las Palmas](https://ikas73.github.io/informe.sector.inmueble/)**
 
 ---
 
@@ -36,12 +35,13 @@ Si has desplegado el proyecto usando GitHub Pages, puedes añadir el enlace aqu�
 - **JavaScript:**
   - **Chart.js:** Creación de gráficos interactivos.
   - Pequeños scripts para animaciones y efectos visuales.
+  -
 
 ---
 
 ## 📂 Estructura del Proyecto
 
-El proyecto se compone de 9 páginas HTML independientes:
+En el proyecto original se compone de 9 páginas HTML independientes:
 
 - `index.html`: Página de portada/introducción.
 - `page_2.html` a `page_9.html`: Contenido detallado del informe, cada archivo representa una "diapositiva" o sección temática.
@@ -60,13 +60,7 @@ El proyecto se compone de 9 páginas HTML independientes:
     cd nombre-del-repositorio
     ```
 3.  **Abre el archivo `index.html`** en tu navegador web preferido.
-4.  Utiliza los botones de paginación ("Anterior" / "Siguiente") para navegar por las distintas secciones del informe.
-
----
-
-## 🤝 Contribuciones (Opcional)
-
-Si deseas permitir contribuciones, puedes añadir una sección aquí explicando cómo hacerlo (ej. abrir Issues, Pull Requests). Si no, puedes omitir esta sección o indicar que no se aceptan por el momento.
+4.  En el pié de pagina utiliza los botones de paginación ("Anterior" / "Siguiente") para navegar por las distintas secciones del informe.
 
 ---
 
