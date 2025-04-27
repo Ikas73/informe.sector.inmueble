@@ -4,291 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Análisis Inmobiliario LPGC - Portada</title>
-    <!-- Título añadido -->
+    <!-- Enlaces a librerías (Tailwind, FontAwesome, etc.) -->
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
-    <link
+    <!-- Si usas Tailwind -->
+    <!-- Old "<link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
-    />
+    />" -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Montserrat", sans-serif;
-      }
-      .slide {
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-          135deg,
-          #0a2342 0%,
-          #1a3c61 50%,
-          #0f3156 100%
-        );
-        color: white;
-      }
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: "Montserrat", sans-serif;
-      }
-      .pagination-background-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 180px;
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.85) 0%,
-          rgba(0, 0, 0, 0.7) 50%,
-          rgba(0, 0, 0, 0) 100%
-        );
-        z-index: 1;
-        pointer-events: none;
-      }
-      .content {
-        position: relative;
-        z-index: 2;
-        padding: 20px 16px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-        box-sizing: border-box;
-      }
-      .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        /* --- Opacidad MÁS ALTA para móvil (base) --- */
-        background: rgba(10, 35, 66, 0.75); /* Ejemplo: 80% opacidad */
-        z-index: 1;
-      }
-      .background-image {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url("https://images.pexels.com/photos/22080094/pexels-photo-22080094/free-photo-of-blanco-y-negro-carretera-trafico-edificios.jpeg");
-        background-size: cover;
-        background-position: center;
-        opacity: 0.85;
-        clip-path: none;
-      }
-      .header {
-        margin-bottom: 20px;
-      }
-      .title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        line-height: 1.15;
-        margin-bottom: 15px;
-        max-width: 100%;
-        letter-spacing: -0.5px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      .decorative-line {
-        width: 100px;
-        height: 3px;
-        background: linear-gradient(to right, #4ecdc4, #56e8e0);
-        margin: 15px 0;
-        box-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
-      }
-      .subtitle {
-        font-size: 1.1rem;
-        font-weight: 300;
-        color: #4ecdc4; /* Color mantenido para contraste */
-        line-height: 1.4;
-        max-width: 100%;
-        margin-bottom: 15px;
-      }
-      .features {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .feature {
-        display: flex;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.07);
-        padding: 10px 15px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-      .feature:hover {
-        background-color: rgba(255, 255, 255, 0.12);
-        transform: translateY(-2px);
-      }
-      .feature-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(78, 205, 196, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
-      }
-      .date-container {
-        display: flex;
-        align-items: center;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #a7a9ac;
-        letter-spacing: 1px;
-      }
-      .date-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
-      }
-      .circle-decoration {
-        position: absolute;
-        bottom: -50px;
-        left: -50px;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle,
-          rgba(78, 205, 196, 0.1) 0%,
-          rgba(10, 35, 66, 0) 70%
-        );
-        z-index: 0;
-      }
-      .pagination-container {
-        margin-top: auto;
-        padding-top: 15px;
-      }
+    <!-- Ejemplo FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+    />
 
-      /* --- Estilos de paginación modificados --- */
-      .pagination-controls {
-        margin-top: 15px;
-        padding-top: 1rem; /* Mantenemos padding superior */
-        border-top: 1px solid #4a5568; /* Mantenemos borde superior */
-        display: flex; /* Siempre flex */
-        flex-direction: row; /* Siempre en fila */
-        justify-content: space-between; /* Separa el botón Anterior del grupo Siguiente */
-        align-items: center; /* Alinea verticalmente los elementos */
-      }
+    <!-- ¡¡ENLACE A TU CSS PRINCIPAL!! (Ajusta la ruta si es necesario) -->
+    <link rel="stylesheet" href="./css/main.css" />
 
-      /* Aseguramos tamaño de fuente base para móvil */
-      .pagination-controls span,
-      .pagination-controls a {
-        font-size: 0.8rem; /* Tamaño base para móvil */
-      }
-      .pagination-controls .text-gray-300 {
-        /* Asegurar que el indicador también tenga tamaño base */
-        font-size: 0.8rem;
-      }
-      /* --- Fin de estilos de paginación modificados --- */
+    <!-- ¡¡TU SCRIPT PRINCIPAL!! -->
+    <script src="./js/main.js"></script>
 
-      .oculto {
-        display: none;
-      }
-
-      /* Media Queries para pantallas más grandes (Mobile-First) */
-      @media only screen and (min-width: 768px) {
-        /* --- (Opcional) Reducir opacidad en escritorio --- */
-        .overlay {
-          background: rgba(
-            10,
-            35,
-            66,
-            0.6
-          ); /* Ejemplo: 50% opacidad para escritorio */
-        }
-        .content {
-          padding: 70px 60px;
-        }
-        .background-image {
-          width: 65%;
-          clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-        .title {
-          font-size: 3rem;
-          margin-bottom: 30px;
-          max-width: 700px;
-        }
-        .decorative-line {
-          width: 140px;
-          height: 4px;
-          margin: 30px 0;
-        }
-        .subtitle {
-          font-size: 1.6rem;
-          margin-bottom: 30px;
-          max-width: 600px;
-        }
-        .features {
-          flex-direction: row;
-          gap: 30px;
-          margin-top: 40px;
-        }
-        .feature {
-          padding: 12px 20px;
-        }
-        .feature-icon {
-          width: 40px;
-          height: 40px;
-          margin-right: 15px;
-        }
-        .date-container {
-          font-size: 1.2rem;
-        }
-        .date-icon {
-          width: 36px;
-          height: 36px;
-          margin-right: 12px;
-        }
-        .circle-decoration {
-          bottom: -100px;
-          left: -100px;
-          width: 300px;
-          height: 300px;
-        }
-
-        /* --- Ajustes de paginación para escritorio --- */
-        .pagination-controls {
-          margin-top: 20px;
-          padding-top: 1.5rem;
-        }
-
-        /* Ajustar tamaño de fuente de los controles específicos si es necesario */
-        .pagination-controls span,
-        .pagination-controls a {
-          font-size: 0.875rem; /* Ejemplo de ajuste de fuente para escritorio */
-        }
-        .pagination-controls .text-gray-300 {
-          /* Asegurar que el indicador también cambie */
-          font-size: 0.875rem;
-        }
-        .oculto {
-          display: hidden;
-        }
-        /* --- Fin de ajustes de paginación para escritorio --- */
-      }
-    </style>
+    <!-- Script de Chart.js (si lo usas en el head, aunque es mejor al final del body) -->
+    <!-- Librerías JS (como Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <div class="slide">
